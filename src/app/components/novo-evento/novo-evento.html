@@ -1,0 +1,117 @@
+<h2 class="text-success mb-4">
+  Criar Novo Evento
+</h2>
+
+<div class="card card-dashboard">
+  <div class="card-body">
+
+    <form (ngSubmit)="criarEvento()" #eventoForm="ngForm">
+
+      <div class="row">
+
+        <!-- COLUNA ESQUERDA -->
+        <div class="col-md-8">
+
+          <div class="mb-3">
+            <label class="form-label">Título do Evento *</label>
+            <input type="text" class="form-control" [(ngModel)]="evento.nome" name="nome" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Descrição *</label>
+            <textarea class="form-control" rows="4" [(ngModel)]="evento.descricao" name="descricao" required></textarea>
+          </div>
+
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Data do Evento *</label>
+              <input type="datetime-local" class="form-control" [(ngModel)]="evento.dataHora" name="dataHora" required>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Local *</label>
+              <input type="text" class="form-control" [(ngModel)]="evento.local" name="local" required>
+            </div>
+
+          </div>
+
+          <div class="row">
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Categoria *</label>
+              <select class="form-select" [(ngModel)]="evento.categoria" name="categoria" required>
+                <option value="">Selecione uma categoria</option>
+                <option value="Reflorestamento">Reflorestamento</option>
+                <option value="Limpeza de Rios">Limpeza de Rios</option>
+                <option value="Palestra">Palestra</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Mutirão">Mutirão</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Organizador *</label>
+              <input type="text" class="form-control" [(ngModel)]="evento.organizador" name="organizador" required>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- COLUNA DIREITA -->
+        <div class="col-md-4">
+
+          <div class="mb-3">
+            <label class="form-label">Imagem do Evento</label>
+            <input
+              type="file"
+              class="form-control"
+              accept="image/*"
+              (change)="previewImagem($event)">
+          </div>
+
+          <div class="image-preview mt-2">
+            <img *ngIf="imagemPreview" [src]="imagemPreview" style="max-height:200px;" class="img-fluid rounded">
+            <span *ngIf="!imagemPreview" class="text-muted">Pré-visualização da imagem</span>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Contato *</label>
+            <input type="email" class="form-control" [(ngModel)]="evento.contato" name="contato" required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Requisitos</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="evento.requisitos" name="requisitos"></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Vagas</label>
+            <input type="number" class="form-control" [(ngModel)]="evento.vagas" name="vagas">
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BOTÕES -->
+      <div class="text-end mt-3">
+
+        <button type="button" class="btn btn-secondary me-2" (click)="cancelar()" [disabled]="loading">
+          Cancelar
+        </button>
+
+        <button type="submit" class="btn btn-success" [disabled]="loading">
+          <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+          {{ loading ? 'Criando...' : 'Criar Evento' }}
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+</div>
