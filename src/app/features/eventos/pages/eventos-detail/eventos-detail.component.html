@@ -1,0 +1,182 @@
+<!-- src/app/features/eventos/pages/eventos-detail/eventos-detail.component.html -->
+<!-- Loading State -->
+<div *ngIf="loading" class="text-center py-5" id="loadingEvento">
+  <div class="spinner-border text-success" role="status">
+    <span class="visually-hidden">Carregando evento...</span>
+  </div>
+  <p class="mt-3">Carregando detalhes do evento...</p>
+</div>
+
+<!-- Estado de Erro -->
+<div *ngIf="error" class="text-center py-5" id="errorEvento">
+  <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
+  <h3 class="mt-3">Evento não encontrado</h3>
+  <p class="text-muted mb-4">O evento que você está procurando não existe ou foi removido.</p>
+  <a routerLink="/" class="btn btn-success">
+    <i class="bi bi-arrow-left me-2"></i>Voltar para Eventos
+  </a>
+</div>
+
+<!-- Conteúdo do Evento -->
+<div *ngIf="!loading && !error && evento" id="eventoContent">
+  <!-- Hero Section com imagem -->
+  <div class="evento-hero rounded-4 mb-5" 
+       [style.backgroundImage]="'linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url(' + imagemHeroUrl + ')'">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <!-- Badge de Status -->
+          <span *ngIf="isConcluido" class="badge bg-secondary fs-6 mb-3">Evento Realizado</span>
+          <span *ngIf="!isConcluido" class="badge bg-success fs-6 mb-3">Em Breve</span>
+          
+          <!-- Badge de Categoria -->
+          <span class="categoria-badge mb-3">{{ evento.categoria || 'Evento Ambiental' }}</span>
+          
+          <!-- Título -->
+          <h1 class="display-5 fw-bold mb-3">{{ evento.nome }}</h1>
+          
+          <!-- Descrição Curta -->
+          <p class="lead mb-4">{{ getDescricaoCurta() }}</p>
+          
+          <!-- Info Rápida -->
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <span class="participantes-count">
+              <i class="bi bi-people-fill me-2"></i>
+              {{ evento.participantes || 0 }} participantes
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Coluna Principal -->
+    <div class="col-lg-8">
+      <!-- Imagem do Evento -->
+      <div class="mb-5" *ngIf="evento.imagemPrincipal">
+        <img [src]="imagemPrincipalUrl" 
+             [alt]="evento.nome" 
+             class="evento-image w-100">
+      </div>
+
+      <!-- Descrição Detalhada -->
+      <div class="info-card">
+        <h3 class="mb-4 text-success">
+          <i class="bi bi-info-circle me-2"></i>Sobre o Evento
+        </h3>
+        <p class="fs-5">{{ evento.descricao }}</p>
+      </div>
+
+      <!-- Requisitos -->
+      <div class="info-card" *ngIf="evento.requisitos">
+        <h3 class="mb-4 text-success">
+          <i class="bi bi-clipboard-check me-2"></i>O que levar e preparativos
+        </h3>
+        <p>{{ evento.requisitos }}</p>
+      </div>
+    </div>
+
+    <!-- Sidebar com Informações -->
+    <div class="col-lg-4">
+      <!-- Informações do Evento -->
+      <div class="info-card">
+        <h4 class="mb-4 text-success">
+          <i class="bi bi-calendar-event me-2"></i>Informações
+        </h4>
+        
+        <div class="info-item">
+          <i class="bi bi-calendar-date"></i>
+          <div>
+            <strong>Data do Evento</strong>
+            <div class="text-muted">{{ getDataFormatada(evento.dataHora) }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="bi bi-geo-alt"></i>
+          <div>
+            <strong>Local</strong>
+            <div class="text-muted">{{ evento.local }}</div>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <i class="bi bi-clock"></i>
+          <div>
+            <strong>Horário</strong>
+            <div class="text-muted">{{ getHorarioFormatado(evento.dataHora) }}h</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Informações do Organizador -->
+      <div class="info-card">
+        <h4 class="mb-4 text-success">
+          <i class="bi bi-building me-2"></i>Organização
+        </h4>
+        
+        <div class="info-item">
+          <i class="bi bi-building"></i>
+          <div>
+            <strong>Organizador</strong>
+            <div class="text-muted">{{ evento.organizador || 'EcoEventos' }}</div>
+          </div>
+        </div>
+
+        <div class="info-item" *ngIf="evento.contato">
+          <i class="bi bi-envelope"></i>
+          <div>
+            <strong>Contato</strong>
+            <div class="text-muted">{{ evento.contato }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botão Participar -->
+      <div class="info-card text-center" *ngIf="!isConcluido">
+        <button class="btn-participar w-100" (click)="participarEvento()">
+          <i class="bi bi-check-circle me-2"></i>
+          Inscrever-se
+        </button>
+        <p class="text-muted mt-3 small">
+          <i class="bi bi-info-circle me-1"></i>
+          Você será redirecionado para o formulário de inscrição
+        </p>
+      </div>
+
+      <div class="info-card text-center" *ngIf="isConcluido">
+        <div class="alert alert-secondary mb-0">
+          <i class="bi bi-clock-history me-2"></i>
+          Este evento já foi realizado
+        </div>
+      </div>
+
+      <!-- Botão Admin (apenas para admins) -->
+      <div class="info-card text-center" *ngIf="authService.isAdmin()">
+        <a [routerLink]="['/admin/editar-evento', evento.id]" class="btn btn-outline-success w-100">
+          <i class="bi bi-pencil me-2"></i>
+          Editar Evento
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <i class="bi bi-tree-fill"></i>
+        <span>EcoEventos Palmas</span>
+      </div>
+      <p class="footer-copyright">&copy; 2025 EcoEventos Palmas - Todos os direitos reservados</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Botão Voltar ao Topo -->
+<a href="#" class="back-to-top" (click)="voltarAoTopo($event)">
+  <i class="bi bi-arrow-up"></i>
+</a>

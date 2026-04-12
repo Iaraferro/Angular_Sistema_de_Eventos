@@ -1,0 +1,261 @@
+<!-- src/app/features/admin/pages/relatorios/relatorios.component.html -->
+<div class="relatorios-container">
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-3">Carregando dados...</p>
+  </div>
+
+  <div *ngIf="!loading">
+    <!-- Cabeçalho -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h2 class="text-success">
+        <i class="bi bi-graph-up me-2"></i>Relatórios Personalizados
+      </h2>
+      <div class="btn-group-header">
+        <button class="btn btn-admin btn-outline-secondary me-2" (click)="carregarModeloRelatorio()">
+          <i class="bi bi-file-earmark me-2"></i>Usar Modelo
+        </button>
+        <button class="btn btn-admin btn-admin-primary" (click)="gerarRelatorioPersonalizado()">
+          <i class="bi bi-file-pdf me-2"></i>Gerar PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Coluna Esquerda - Formulário -->
+      <div class="col-lg-8">
+        <div class="card-dashboard mb-4">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-pencil me-2"></i>Editor do Relatório</h5>
+          </div>
+          <div class="card-body">
+            <form id="formRelatorio">
+              <div class="mb-3">
+                <label for="tituloRelatorio" class="form-label">Título do Relatório *</label>
+                <input type="text" class="form-control" id="tituloRelatorio" 
+                       [(ngModel)]="relatorioData.titulo" name="titulo"
+                       placeholder="Ex: Relatório Mensal de Atividades" required>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label for="dataRelatorio" class="form-label">Data do Relatório *</label>
+                  <input type="date" class="form-control" id="dataRelatorio" 
+                         [(ngModel)]="relatorioData.dataRelatorio" name="dataRelatorio" required>
+                </div>
+                <div class="col-md-6">
+                  <label for="periodoRelatorio" class="form-label">Período Abrangido</label>
+                  <input type="text" class="form-control" id="periodoRelatorio" 
+                         [(ngModel)]="relatorioData.periodo" name="periodo"
+                         placeholder="Ex: Janeiro 2024">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="objetivoRelatorio" class="form-label">Objetivo/Resumo Executivo</label>
+                <textarea class="form-control" id="objetivoRelatorio" rows="3" 
+                          [(ngModel)]="relatorioData.objetivo" name="objetivo"
+                          placeholder="Descreva o objetivo principal deste relatório..."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="atividadesRealizadas" class="form-label">Atividades Realizadas</label>
+                <textarea class="form-control" id="atividadesRealizadas" rows="4" 
+                          [(ngModel)]="relatorioData.atividadesRealizadas" name="atividadesRealizadas"
+                          placeholder="Descreva as principais atividades realizadas no período..."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="resultadosAlcancados" class="form-label">Resultados Alcançados</label>
+                <textarea class="form-control" id="resultadosAlcancados" rows="4" 
+                          [(ngModel)]="relatorioData.resultadosAlcancados" name="resultadosAlcancados"
+                          placeholder="Descreva os resultados e conquistas..."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="dificuldadesEncontradas" class="form-label">Dificuldades Encontradas</label>
+                <textarea class="form-control" id="dificuldadesEncontradas" rows="3" 
+                          [(ngModel)]="relatorioData.dificuldadesEncontradas" name="dificuldadesEncontradas"
+                          placeholder="Descreva os desafios e dificuldades..."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="proximasAcoes" class="form-label">Próximas Ações/Recomendações</label>
+                <textarea class="form-control" id="proximasAcoes" rows="3" 
+                          [(ngModel)]="relatorioData.proximasAcoes" name="proximasAcoes"
+                          placeholder="Descreva as próximas etapas e recomendações..."></textarea>
+              </div>
+
+              <div class="mb-3">
+                <label for="observacoes" class="form-label">Observações Finais</label>
+                <textarea class="form-control" id="observacoes" rows="2" 
+                          [(ngModel)]="relatorioData.observacoes" name="observacoes"
+                          placeholder="Observações adicionais..."></textarea>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Direita - Preview e Estatísticas -->
+      <div class="col-lg-4">
+        <!-- Preview Rápido -->
+        <div class="card-dashboard mb-4">
+          <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-eye me-2"></i>Preview do Relatório</h5>
+          </div>
+          <div class="card-body">
+            <div id="previewRelatorio" class="preview-content">
+              <div class="preview-placeholder" *ngIf="!relatorioData.titulo">
+                <i class="bi bi-file-text display-4 text-muted"></i>
+                <p class="text-muted mt-2">Preencha os campos ao lado para ver o preview</p>
+              </div>
+              <div class="preview-text" *ngIf="relatorioData.titulo">
+                <h6 class="text-success">{{ relatorioData.titulo }}</h6>
+                <hr>
+                <p><strong>📅 Data:</strong> {{ relatorioData.dataRelatorio | date:'dd/MM/yyyy' }}</p>
+                <p *ngIf="relatorioData.periodo"><strong>📆 Período:</strong> {{ relatorioData.periodo }}</p>
+                <p *ngIf="relatorioData.objetivo"><strong>🎯 Objetivo:</strong> {{ relatorioData.objetivo | slice:0:100 }}{{ relatorioData.objetivo.length > 100 ? '...' : '' }}</p>
+                <p *ngIf="relatorioData.atividadesRealizadas"><strong>📋 Atividades:</strong> {{ relatorioData.atividadesRealizadas | slice:0:80 }}{{ relatorioData.atividadesRealizadas.length > 80 ? '...' : '' }}</p>
+                <div class="text-end mt-2">
+                  <small class="text-muted">Clique em "Gerar PDF" para visualizar completo</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estatísticas Rápidas -->
+        <div class="card-dashboard">
+          <div class="card-header bg-warning text-white">
+            <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Dados para o Relatório</h5>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label class="form-label">Total de Eventos:</label>
+              <input type="number" class="form-control" 
+                     [(ngModel)]="relatorioData.totalEventos" name="totalEventos">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Total de Participantes:</label>
+              <input type="number" class="form-control" 
+                     [(ngModel)]="relatorioData.totalParticipantes" name="totalParticipantes">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Taxa de Sucesso (%):</label>
+              <input type="number" class="form-control" 
+                     [(ngModel)]="relatorioData.taxaSucesso" name="taxaSucesso" min="0" max="100">
+            </div>
+            <button class="btn btn-outline-success w-100" (click)="atualizarPreview()">
+              <i class="bi bi-arrow-clockwise me-2"></i>Atualizar Preview
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Relatórios Rápidos -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card-dashboard">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-lightning me-2"></i>Relatórios Rápidos</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <div class="stat-card-small text-center">
+                  <i class="bi bi-people display-6 text-primary"></i>
+                  <h3 class="mt-2 mb-0">{{ totalParticipantes }}</h3>
+                  <p class="text-muted small">Total de Participantes</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card-small text-center">
+                  <i class="bi bi-calendar-event display-6 text-success"></i>
+                  <h3 class="mt-2 mb-0">{{ totalEventos }}</h3>
+                  <p class="text-muted small">Eventos Realizados</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card-small text-center">
+                  <i class="bi bi-check-circle display-6 text-warning"></i>
+                  <h3 class="mt-2 mb-0">{{ taxaComparecimento }}%</h3>
+                  <p class="text-muted small">Taxa de Comparecimento</p>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card-small text-center">
+                  <i class="bi bi-star display-6 text-info"></i>
+                  <h3 class="mt-2 mb-0">{{ eventosFuturos }}</h3>
+                  <p class="text-muted small">Próximos Eventos</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="text-end mt-3">
+              <button class="btn btn-admin btn-outline-secondary me-2" (click)="gerarRelatorioMensal()">
+                <i class="bi bi-file-earmark-pdf me-2"></i>PDF do Mês
+              </button>
+              <button class="btn btn-admin btn-admin-primary" (click)="exportarDadosCompletos()">
+                <i class="bi bi-download me-2"></i>Exportar Dados (JSON)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabela de Eventos para Referência -->
+    <div class="row mt-4">
+      <div class="col-12">
+        <div class="card-dashboard">
+          <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-list-ul me-2"></i>Resumo dos Eventos</h5>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Evento</th>
+                    <th>Data</th>
+                    <th>Local</th>
+                    <th>Participantes</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let evento of eventos | slice:0:5">
+                    <td>
+                      <strong>{{ evento.nome }}</strong>
+                      <br>
+                      <small class="text-muted">{{ evento.categoria }}</small>
+                    </td>
+                    <td>{{ formatarData(evento.dataHora) }}</td>
+                    <td>{{ evento.local }}</td>
+                    <td>{{ evento.participantes || 0 }}</td>
+                    <td>
+                      <span [class]="'status-badge ' + getStatusClass(evento)">
+                        {{ getStatusTexto(evento) }}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr *ngIf="eventos.length === 0">
+                    <td colspan="5" class="text-center py-4">
+                      <i class="bi bi-inbox display-6 text-muted"></i>
+                      <p class="text-muted mt-2">Nenhum evento cadastrado</p>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+/* src/app/features/admin/pages/eventos-admin/eventos-admin.component.css */
+.eventos-admin-container {
+  animation: fadeIn 0.5s ease-out;
+  margin-left: 210px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.evento-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-group .btn {
+  padding: 4px 8px;
+  margin: 0 2px;
+}
+
+.table-hover tbody tr {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(46, 139, 87, 0.05);
+}
+
+.card-dashboard {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  background: white;
+}
+
+.card-body {
+  padding: 0;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #2E8B57;
+  color: #495057;
+  font-weight: 600;
+  padding: 12px 16px;
+}
+
+.table tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+.badge-primary {
+  background-color: #2E8B57;
+  color: white;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Modal */
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1050;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-dialog {
+  margin: 1.75rem auto;
+}
+
+.modal-content {
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.modal-header {
+  border-bottom: none;
+}
+
+.modal-footer {
+  border-top: none;
+}
+
+/* Botões */
+.btn-admin {
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+}
+
+.btn-admin-primary {
+  background-color: #2E8B57;
+  color: white;
+}
+
+.btn-admin-primary:hover {
+  background-color: #1d6e44;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.85rem;
+  }
+  
+  .evento-thumbnail {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .btn-group .btn {
+    padding: 3px 6px;
+  }
+  
+  .btn-admin {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+}

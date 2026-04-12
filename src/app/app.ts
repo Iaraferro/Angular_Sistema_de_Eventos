@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Menu } from './components/menu/menu';
-import { Home } from './components/home/home';
+import { Menu } from './shared/components/menu/menu.component';
+import { Home } from './features/home/home';
 
 @Component({
   selector: 'app-root',

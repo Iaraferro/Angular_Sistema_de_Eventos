@@ -1,0 +1,168 @@
+<!-- src/app/features/admin/pages/eventos-form/eventos-form.component.html -->
+<div class="eventos-form-container">
+  <!-- Loading do evento (modo edição) -->
+  <div *ngIf="carregandoEvento" class="text-center py-5">
+    <div class="spinner-border text-success" role="status">
+      <span class="visually-hidden">Carregando evento...</span>
+    </div>
+    <p class="mt-3">Carregando dados do evento...</p>
+  </div>
+
+  <div *ngIf="!carregandoEvento">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="text-success">
+        <i class="bi bi-plus-circle me-2"></i>
+        {{ isEditMode ? 'Editar Evento' : 'Criar Novo Evento' }}
+      </h2>
+      <button class="btn btn-admin btn-outline-secondary" (click)="voltar()">
+        <i class="bi bi-arrow-left me-2"></i>Voltar
+      </button>
+    </div>
+
+    <div class="card-dashboard">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Informações do Evento</h5>
+      </div>
+      <div class="card-body">
+        <form (ngSubmit)="salvarEvento()" #eventoForm="ngForm">
+          <div class="row">
+            <!-- COLUNA ESQUERDA -->
+            <div class="col-md-7">
+              <div class="mb-3">
+                <label for="titulo" class="form-label">
+                  Título do Evento <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="titulo" 
+                       [(ngModel)]="evento.nome" name="nome" #nome="ngModel" required>
+                <div *ngIf="nome.invalid && nome.touched" class="text-danger small">
+                  Título é obrigatório
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="descricao" class="form-label">
+                  Descrição <span class="text-danger">*</span>
+                </label>
+                <textarea class="form-control" id="descricao" rows="4" 
+                          [(ngModel)]="evento.descricao" name="descricao" #descricao="ngModel" required></textarea>
+                <div *ngIf="descricao.invalid && descricao.touched" class="text-danger small">
+                  Descrição é obrigatória
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="dataHora" class="form-label">
+                    Data do Evento <span class="text-danger">*</span>
+                  </label>
+                  <input type="date" class="form-control" id="dataHora" 
+                         [(ngModel)]="evento.dataHora" name="dataHora" #dataHora="ngModel" required>
+                  <div *ngIf="dataHora.invalid && dataHora.touched" class="text-danger small">
+                    Data é obrigatória
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="local" class="form-label">
+                    Local <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="local" 
+                         [(ngModel)]="evento.local" name="local" #local="ngModel" required>
+                  <div *ngIf="local.invalid && local.touched" class="text-danger small">
+                    Local é obrigatório
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="categoria" class="form-label">Categoria</label>
+                  <select class="form-select" id="categoria" 
+                          [(ngModel)]="evento.categoria" name="categoria">
+                    <option value="">Selecione uma categoria</option>
+                    <option value="Reflorestamento">🌳 Reflorestamento</option>
+                    <option value="Limpeza de Rios">💧 Limpeza de Rios</option>
+                    <option value="Palestra">🎤 Palestra</option>
+                    <option value="Workshop">🔧 Workshop</option>
+                    <option value="Mutirão">🤝 Mutirão</option>
+                    <option value="Coleta Seletiva">♻️ Coleta Seletiva</option>
+                    <option value="Educação Ambiental">📚 Educação Ambiental</option>
+                  </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="contato" class="form-label">
+                    E-mail de Contato <span class="text-danger">*</span>
+                  </label>
+                  <input type="email" class="form-control" id="contato" 
+                         [(ngModel)]="evento.contato" name="contato" #contato="ngModel" required>
+                  <div *ngIf="contato.invalid && contato.touched" class="text-danger small">
+                    E-mail é obrigatório
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COLUNA DIREITA -->
+            <div class="col-md-5">
+              <div class="mb-3">
+                <label for="imagem" class="form-label">Imagem do Evento</label>
+                <input type="file" class="form-control" id="imagem" 
+                       accept="image/*" (change)="previewImagem($event)">
+                <div class="form-text">Formatos: JPG, PNG, GIF. Máx: 5MB</div>
+                <div class="image-preview mt-2">
+                  <div *ngIf="!imagemPreview" class="text-center text-muted py-3">
+                    <i class="bi bi-image display-6"></i>
+                    <p class="mb-0 small">Pré-visualização da imagem</p>
+                  </div>
+                  <img *ngIf="imagemPreview" [src]="imagemPreview" class="img-fluid rounded" style="max-height: 150px;">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="requisitos" class="form-label">Requisitos</label>
+                <textarea class="form-control" id="requisitos" rows="3" 
+                          [(ngModel)]="evento.requisitos" name="requisitos"
+                          placeholder="Ex: Levar água, roupas confortáveis..."></textarea>
+              </div>
+
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <label for="participantes" class="form-label">Vagas</label>
+                  <input type="number" class="form-control" id="participantes" 
+                         [(ngModel)]="evento.participantes" name="participantes" min="0">
+                </div>
+                <div class="col-6 mb-3">
+                  <label for="linkInscricao" class="form-label">Link de Inscrição</label>
+                  <input type="url" class="form-control" id="linkInscricao" 
+                         [(ngModel)]="evento.linkInscricao" name="linkInscricao"
+                         placeholder="https://forms.gle/...">
+                  <div class="form-text">Link externo para inscrição</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-4">
+
+          <!-- BOTÕES -->
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-admin btn-outline-secondary" 
+                    (click)="cancelar()" [disabled]="loading">
+              <i class="bi bi-x-circle me-2"></i>Cancelar
+            </button>
+            <button type="submit" class="btn btn-admin btn-admin-primary" 
+                    [disabled]="loading">
+              <i class="bi bi-check-circle me-2"></i>
+              <span *ngIf="loading; else normalText">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                {{ isEditMode ? 'Atualizando...' : 'Criando...' }}
+              </span>
+              <ng-template #normalText>
+                {{ isEditMode ? 'Atualizar Evento' : 'Criar Evento' }}
+              </ng-template>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
