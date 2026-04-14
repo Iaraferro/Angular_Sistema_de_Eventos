@@ -14,9 +14,9 @@ import { UsuariosComponent } from './features/admin/pages/usuarios/usuarios.comp
 
 
 export const routes: Routes = [
-   { path: '', component: Home, title: 'EcoEventos Palmas' },
-  { path: 'login', component: Login, title: 'Login' },
+  { path: '', component: Home, title: 'EcoEventos Palmas' },
   { path: 'eventos/:id', component: Eventos, title: 'Detalhes do Evento' },
+  { path: 'login', component: Login, title: 'Login' },
   {
     path: 'admin',
     component: Admin,
@@ -29,7 +29,7 @@ export const routes: Routes = [
       { path: 'editar-evento/:id', component: EventoForm, title: 'Editar Evento' },
       { path: 'participantes', component: Participantes, title: 'Participantes' },
       { path: 'relatorios', component: Relatorios, title: 'Relatórios' },
-       { path: 'usuarios', component: UsuariosComponent, title: 'Usuários' },
+      { path: 'usuarios', component: UsuariosComponent, title: 'Usuários' },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
