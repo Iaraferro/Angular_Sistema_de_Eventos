@@ -4,7 +4,6 @@ import { RouterModule } from '@angular/router';
 import { Evento } from '../../shared/models/evento.model';
 import { Subscription } from 'rxjs';
 
-import { E } from '@angular/cdk/keycodes';
 import { EventoService } from '../../core/service/evento.service';
 import { AuthService } from '../../core/service/auth.service';
 

@@ -1,7 +1,7 @@
 /* src/app/features/admin/pages/dashboard/dashboard.component.css */
 .dashboard-container {
   animation: fadeIn 0.5s ease-out;
-  margin-left: 220px;
+ margin-left: 210px;
 }
 
 @keyframes fadeIn {

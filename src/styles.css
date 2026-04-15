@@ -20,7 +20,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  
   border-radius: 10px;
 }
 
@@ -52,8 +52,7 @@ body {
 }
 
 .toast {
-  background: white;
-  border-radius: 12px;
+  
   box-shadow: 0 5px 20px rgba(0,0,0,0.15);
   border-left: 4px solid #2E8B57;
 }
@@ -68,4 +67,22 @@ body {
 
 .toast-warning {
   border-left-color: #ffc107;
+}
+
+
+/* Remove outline e box-shadow dos botões do menu */
+.navbar-toggler:focus,
+.navbar-toggler:active {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Remove borda branca do toggler */
+.navbar-toggler {
+  border: none;
+}
+
+/* Remove background branco do collapse */
+.navbar-collapse {
+  background-color: #2E8B57;
 }
