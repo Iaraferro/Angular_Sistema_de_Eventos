@@ -21,10 +21,6 @@ export class ArquivoService {
     return this.http.post<Arquivo>(`${this.apiUrl}/${idEvento}/arquivos`, formData);
   }
 
-  listarPorEvento(idEvento: number): Observable<Arquivo[]> {
-    return this.http.get<Arquivo[]>(`${this.apiUrl}/${idEvento}/arquivos`);
-  }
-
   baixar(nomeArquivo: string): Observable<Blob> {
     return this.http.get(`${this.arquivosUrl}/${nomeArquivo}`, {
       responseType: 'blob'

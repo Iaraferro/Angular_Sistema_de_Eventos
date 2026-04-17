@@ -23,8 +23,8 @@ evento: Evento | null = null;
   loading = true;
   error = false;
   isConcluido = false;
-  imagemHeroUrl = 'assets/images/evento-placeholder.jpg';
-  imagemPrincipalUrl = 'assets/images/evento-placeholder.jpg';
+  imagemHeroUrl = '';
+  imagemPrincipalUrl = '';
   
   private subscriptions: Subscription = new Subscription();
 
@@ -71,7 +71,7 @@ evento: Evento | null = null;
     );
   }
 
-  getImagemUrl(imagemPrincipal: string | undefined): string {
+  getImagemUrl(imagemPrincipal: string | null | undefined): string {
     return this.eventoService.getImagemUrl(imagemPrincipal);
   }
 

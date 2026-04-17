@@ -1,7 +1,6 @@
 export interface Auth {
-    logout(): unknown;
     username: string;
-    senha?: string;
+    senha: string;
 }
 
 export interface Perfil {

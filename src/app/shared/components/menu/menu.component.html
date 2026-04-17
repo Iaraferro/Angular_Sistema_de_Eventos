@@ -1,31 +1,31 @@
 <!-- src/app/shared/components/menu/menu.component.html -->
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
   <div class="container">
-    <a class="navbar-brand fw-bold" routerLink="/">
+    <a class="navbar-brand fw-bold" routerLink="/" (click)="closeNav()">
       <i class="bi bi-tree-fill me-2"></i>EcoEventos Palmas
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <button class="navbar-toggler" type="button" (click)="toggleNav()" [attr.aria-expanded]="navOpen" aria-label="Abrir menu">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <div class="navbar-collapse" [class.collapse]="!navOpen" [class.show]="navOpen" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeNav()">
             Início
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" fragment="eventos" routerLinkActive="active">
+          <a class="nav-link" routerLink="/" fragment="eventos" (click)="closeNav()">
             Eventos
           </a>
         </li>
         <li class="nav-item" *ngIf="authService.isAdmin()">
-          <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
+          <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active" (click)="closeNav()">
             <i class="bi bi-shield-lock me-1"></i>Admin
           </a>
         </li>
         <li class="nav-item" *ngIf="!authService.isLoggedIn()">
-          <a class="nav-link" routerLink="/login" routerLinkActive="active">
+          <a class="nav-link" routerLink="/login" routerLinkActive="active" (click)="closeNav()">
             <i class="bi bi-box-arrow-in-right me-1"></i>Login
           </a>
         </li>

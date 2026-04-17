@@ -13,9 +13,20 @@ import { RouterModule } from '@angular/router';
   styleUrl: './menu.component.css',
 })
 export class Menu {
-   constructor(public authService: AuthService) {}
+  navOpen = false;
+
+  constructor(public authService: AuthService) {}
+
+  toggleNav(): void {
+    this.navOpen = !this.navOpen;
+  }
+
+  closeNav(): void {
+    this.navOpen = false;
+  }
 
   logout(): void {
     this.authService.logout();
+    this.closeNav();
   }
 }

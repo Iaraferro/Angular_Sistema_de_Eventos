@@ -1,7 +1,6 @@
 /* src/app/features/admin/pages/usuarios/usuarios.component.css */
 .usuarios-container {
   animation: fadeIn 0.5s ease-out;
-   margin-left: 210px;
 }
 
 @keyframes fadeIn {
@@ -163,22 +162,59 @@
   .table {
     font-size: 0.85rem;
   }
-  
+
   .table thead th,
   .table tbody td {
     padding: 8px 12px;
   }
-  
+
   .btn-group .btn {
     padding: 3px 6px;
   }
-  
+
   .btn-admin {
     padding: 8px 16px;
     font-size: 0.85rem;
   }
-  
+
   .modal-body {
     padding: 20px;
+  }
+
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-dialog {
+    margin: 10px;
+    max-width: calc(100% - 20px);
+  }
+
+  .modal-body {
+    padding: 16px;
+  }
+
+  .form-control, .form-select {
+    font-size: 16px; /* Prevent iOS zoom on focus */
   }
 }

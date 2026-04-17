@@ -1,9 +1,12 @@
 <!-- src/app/features/admin/admin.component.html -->
 <div class="admin-wrapper">
+  <!-- Mobile overlay backdrop -->
+  <div class="sidebar-backdrop" [class.active]="sidebarOpen" (click)="toggleSidebar()"></div>
+
   <!-- Sidebar -->
   <aside class="sidebar" [class.open]="sidebarOpen">
     <div class="sidebar-header">
-      <a routerLink="/admin/dashboard" class="sidebar-logo">
+      <a routerLink="/admin/dashboard" class="sidebar-logo" (click)="sidebarOpen = false">
         <i class="bi bi-tree-fill"></i>
         <span>EcoEventos</span>
       </a>
@@ -21,37 +24,37 @@
 
     <nav class="sidebar-nav">
       <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
+        <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active" (click)="sidebarOpen = false">
           <i class="bi bi-speedometer2"></i>
           <span>Dashboard</span>
         </a>
       </div>
       <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/eventos" routerLinkActive="active">
+        <a class="nav-link" routerLink="/admin/eventos" routerLinkActive="active" (click)="sidebarOpen = false">
           <i class="bi bi-calendar-event"></i>
           <span>Eventos</span>
         </a>
       </div>
       <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/novo-evento" routerLinkActive="active">
+        <a class="nav-link" routerLink="/admin/novo-evento" routerLinkActive="active" (click)="sidebarOpen = false">
           <i class="bi bi-plus-circle"></i>
           <span>Novo Evento</span>
         </a>
       </div>
       <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/participantes" routerLinkActive="active">
+        <a class="nav-link" routerLink="/admin/participantes" routerLinkActive="active" (click)="sidebarOpen = false">
           <i class="bi bi-people"></i>
           <span>Participantes</span>
         </a>
       </div>
       <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/relatorios" routerLinkActive="active">
+        <a class="nav-link" routerLink="/admin/relatorios" routerLinkActive="active" (click)="sidebarOpen = false">
           <i class="bi bi-graph-up"></i>
           <span>Relatórios</span>
         </a>
       </div>
       <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/usuarios" routerLinkActive="active">
+        <a class="nav-link" routerLink="/admin/usuarios" routerLinkActive="active" (click)="sidebarOpen = false">
           <i class="bi bi-person-badge"></i>
           <span>Usuários</span>
         </a>
@@ -69,10 +72,13 @@
   <!-- Main Content -->
   <main class="main-content">
     <div class="top-bar">
+      <button class="sidebar-toggle-inline" (click)="toggleSidebar()" aria-label="Menu">
+        <i class="bi bi-list"></i>
+      </button>
       <h1 class="page-title">{{ currentTitle }}</h1>
       <div class="top-bar-actions">
         <a routerLink="/" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-globe"></i> Ver Site
+          <i class="bi bi-globe"></i> <span class="d-none d-sm-inline">Ver Site</span>
         </a>
       </div>
     </div>
@@ -81,8 +87,8 @@
     </div>
   </main>
 
-  <!-- Mobile Toggle -->
-  <button class="sidebar-toggle" (click)="toggleSidebar()">
+  <!-- Mobile Toggle FAB -->
+  <button class="sidebar-toggle" (click)="toggleSidebar()" aria-label="Menu">
     <i [class]="sidebarOpen ? 'bi bi-x-lg' : 'bi bi-list'"></i>
   </button>
 </div>

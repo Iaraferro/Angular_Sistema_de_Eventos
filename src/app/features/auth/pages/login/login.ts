@@ -35,13 +35,9 @@ export class Login implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    // CORRIGIDO: Removeu o objeto com logout fictício
     this.authService.login({
       username: this.username,
-      senha: this.senha,
-      logout: function (): unknown {
-        throw new Error('Function not implemented.');
-      }
+      senha: this.senha
     }).subscribe({
       next: (response) => {
         console.log('Login successful', response);

@@ -7,10 +7,47 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   font-family: 'Roboto', 'Segoe UI', sans-serif;
   background-color: #f8f9fa;
   color: #333;
+  font-size: 16px;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Ensure images never overflow their container */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Minimum touch target size for buttons on mobile */
+@media (max-width: 768px) {
+  .btn {
+    min-height: 44px;
+  }
+}
+
+/* Ensure container has side padding on mobile */
+.container {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+@media (max-width: 576px) {
+  body {
+    font-size: 15px;
+  }
+
+  .container, .container-fluid {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
 }
 
 /* Scrollbar personalizada */

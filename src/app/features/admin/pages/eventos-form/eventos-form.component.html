@@ -53,9 +53,9 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="dataHora" class="form-label">
-                    Data do Evento <span class="text-danger">*</span>
+                    Data e Hora <span class="text-danger">*</span>
                   </label>
-                  <input type="date" class="form-control" id="dataHora" 
+                  <input type="datetime-local" class="form-control" id="dataHora"
                          [(ngModel)]="evento.dataHora" name="dataHora" #dataHora="ngModel" required>
                   <div *ngIf="dataHora.invalid && dataHora.touched" class="text-danger small">
                     Data é obrigatória
@@ -118,8 +118,15 @@
               </div>
 
               <div class="mb-3">
+                <label for="organizador" class="form-label">Organizador</label>
+                <input type="text" class="form-control" id="organizador"
+                       [(ngModel)]="evento.organizador" name="organizador"
+                       placeholder="Nome do organizador">
+              </div>
+
+              <div class="mb-3">
                 <label for="requisitos" class="form-label">Requisitos</label>
-                <textarea class="form-control" id="requisitos" rows="3" 
+                <textarea class="form-control" id="requisitos" rows="3"
                           [(ngModel)]="evento.requisitos" name="requisitos"
                           placeholder="Ex: Levar água, roupas confortáveis..."></textarea>
               </div>

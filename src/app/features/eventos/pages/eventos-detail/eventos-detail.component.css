@@ -1,222 +1,267 @@
-/* src/app/features/eventos/pages/eventos-detail/eventos-detail.component.css */
-:root {
-  --primary: #2E8B57;
-  --primary-dark: #1d6e44;
-  --secondary: #8FBC8F;
-  --accent: #FFD700;
-  --dark-green: #006400;
-  --light: #F5F5F5;
-  --danger: #dc3545;
-  --warning: #ffc107;
+/* =====================================================
+   Evento Detail — estilos do componente
+   ===================================================== */
+
+/* Wrapper com offset do navbar fixo */
+.detail-wrapper {
+  padding-top: 76px;
+  padding-bottom: 40px;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  
+/* Loading / Erro centralizados */
+.estado-central {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 20px 40px;
 }
 
-body {
-  font-family: 'Roboto', sans-serif;
-  background-color: #f9f9f9;
-}
-
-/* Hero Section */
+/* ── Hero ──────────────────────────────────────────── */
 .evento-hero {
   background-size: cover;
   background-position: center;
   color: white;
-  padding: 80px 0;
-  margin-bottom: 40px;
-  border-radius: 20px;
-  position: relative;
+  padding: 72px 0;
+  margin-bottom: 0;
 }
 
-.evento-hero .container {
-  position: relative;
-  z-index: 2;
-}
-
-/* Badges */
-.badge {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 500;
-  font-size: 0.85rem;
-}
-
-.badge-success {
-  background-color: var(--primary);
-}
-
-.badge-secondary {
-  background-color: #6c757d;
+.hero-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
 }
 
 .categoria-badge {
-  background: var(--secondary);
-  color: var(--dark-green);
-  padding: 5px 15px;
+  background: rgba(143, 188, 143, 0.85);
+  color: #006400;
+  padding: 5px 14px;
   border-radius: 20px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  display: inline-block;
-  margin-right: 10px;
-}
-
-/* Imagem do Evento */
-.evento-image {
-  height: 400px;
-  object-fit: cover;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-}
-
-/* Cards de Informação */
-.info-card {
-  background: white;
-  border-radius: 15px;
-  padding: 25px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-  margin-bottom: 25px;
-  border-left: 5px solid var(--primary);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.info-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-  padding: 10px;
-  border-radius: 8px;
-  transition: background-color 0.3s;
-}
-
-.info-item:hover {
-  background-color: rgba(46, 139, 87, 0.05);
-}
-
-.info-item i {
-  color: var(--primary);
-  font-size: 1.2rem;
-  margin-right: 15px;
-  width: 30px;
-  text-align: center;
-}
-
-.info-item strong {
-  display: block;
-  margin-bottom: 3px;
-}
-
-/* Botão Participar */
-.btn-participar {
-  background: linear-gradient(135deg, var(--primary), var(--dark-green));
-  color: white;
-  padding: 15px 30px;
-  font-size: 1.1rem;
+  font-size: 0.85rem;
   font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-  box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
-  cursor: pointer;
-}
-
-.btn-participar:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(46, 139, 87, 0.4);
-}
-
-.btn-participar:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Botão Editar */
-.btn-outline-success {
-  border: 2px solid var(--primary);
-  color: var(--primary);
-  padding: 12px 20px;
-  font-weight: 600;
-  border-radius: 10px;
-  transition: all 0.3s;
-  background: transparent;
-  cursor: pointer;
-  text-decoration: none;
   display: inline-block;
-  text-align: center;
 }
 
-.btn-outline-success:hover {
-  background-color: var(--primary);
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Participantes Count */
 .participantes-count {
-  background: var(--primary);
+  background: #2E8B57;
   color: white;
   border-radius: 20px;
-  padding: 5px 15px;
+  padding: 6px 16px;
   font-size: 0.9rem;
   display: inline-flex;
   align-items: center;
 }
 
-/* Alert */
-.alert-secondary {
-  background-color: #f8f9fa;
-  border-color: #e0e0e0;
-  color: #6c757d;
-  padding: 15px;
-  border-radius: 10px;
+/* ── Container principal ───────────────────────────── */
+.conteudo-container {
+  padding-top: 32px;
+  padding-bottom: 16px;
 }
 
-/* Botão Voltar ao Topo */
-.back-to-top {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  background-color: var(--primary);
-  color: white;
-  padding: 12px;
-  border-radius: 50%;
-  display: none;
-  transition: all 0.3s;
-  z-index: 1000;
-  text-decoration: none;
-  width: 45px;
-  height: 45px;
-  text-align: center;
-  line-height: 21px;
-  cursor: pointer;
+/* ── Imagem do evento ──────────────────────────────── */
+.evento-image-wrapper {
+  width: 100%;
+  height: 360px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-.back-to-top.show {
+.evento-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
   display: block;
 }
 
-.back-to-top:hover {
-  background-color: var(--primary-dark);
-  transform: translateY(-2px);
+.evento-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #2E8B57 0%, #1d6e44 60%, #4aa87a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: rgba(255,255,255,0.85);
 }
 
-/* Footer */
+.evento-image-placeholder i {
+  font-size: 4rem;
+  opacity: 0.9;
+}
+
+.evento-image-placeholder span {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.75;
+}
+
+/* ── Cards de informação ───────────────────────────── */
+.info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  border-left: 4px solid #2E8B57;
+  /* sem margin-bottom — Bootstrap g-4 cuida do espaçamento entre colunas,
+     mas dentro da mesma coluna precisamos de espaço entre cards */
+  margin-bottom: 24px;
+}
+
+.info-card:last-child {
+  margin-bottom: 0;
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #2E8B57;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title i {
+  font-size: 1.1rem;
+}
+
+/* ── Itens dentro dos cards ────────────────────────── */
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 10px 8px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  transition: background 0.2s;
+}
+
+.info-item:hover {
+  background: rgba(46, 139, 87, 0.05);
+}
+
+.info-item > i {
+  color: #2E8B57;
+  font-size: 1.1rem;
+  margin-top: 2px;
+  flex-shrink: 0;
+  width: 22px;
+  text-align: center;
+}
+
+.info-item strong {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 2px;
+  color: #343a40;
+}
+
+.info-item .text-muted {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+/* ── Link de Inscrição ─────────────────────────────── */
+.link-inscricao {
+  color: #2E8B57;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: color 0.2s;
+}
+
+.link-inscricao:hover {
+  color: #1d6e44;
+  text-decoration: underline;
+}
+
+.link-inscricao i {
+  font-size: 0.75rem;
+}
+
+/* ── Botão Inscrever-se ────────────────────────────── */
+.btn-participar {
+  width: 100%;
+  background: linear-gradient(135deg, #2E8B57, #1d6e44);
+  color: white;
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 14px rgba(46, 139, 87, 0.3);
+  min-height: 48px;
+}
+
+.btn-participar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(46, 139, 87, 0.4);
+}
+
+.btn-participar:active {
+  transform: translateY(0);
+}
+
+/* ── Evento Concluído ──────────────────────────────── */
+.alert-concluido {
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  color: #6c757d;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+/* ── Botão Editar ──────────────────────────────────── */
+.btn-editar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px 20px;
+  border: 2px solid #2E8B57;
+  border-radius: 10px;
+  color: #2E8B57;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  min-height: 44px;
+  background: transparent;
+}
+
+.btn-editar:hover {
+  background: #2E8B57;
+  color: white;
+}
+
+/* ── Footer ────────────────────────────────────────── */
 .footer {
-  background: var(--primary-dark);
+  background: #1d6e44;
   color: white;
   padding: 30px 0;
   text-align: center;
-  margin-top: 60px;
+  margin-top: 40px;
 }
 
 .footer-brand {
@@ -224,13 +269,9 @@ body {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.footer-brand i {
-  font-size: 1.5rem;
+  margin-bottom: 10px;
 }
 
 .footer-copyright {
@@ -238,81 +279,115 @@ body {
   opacity: 0.8;
 }
 
-/* Spinner */
-.spinner-border.text-success {
-  color: var(--primary) !important;
-  width: 3rem;
-  height: 3rem;
+/* ── Voltar ao Topo ────────────────────────────────── */
+.back-to-top {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #2E8B57;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: all 0.3s;
 }
 
-/* Animações */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.back-to-top.show {
+  display: flex;
 }
 
-.info-card {
-  animation: fadeIn 0.5s ease-out;
+.back-to-top:hover {
+  background: #1d6e44;
+  transform: translateY(-2px);
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
+/* ── Responsividade ────────────────────────────────── */
+@media (max-width: 992px) {
   .evento-hero {
-    padding: 60px 0;
+    padding: 56px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-wrapper {
+    padding-top: 70px;
+    padding-bottom: 24px;
+  }
+
+  .evento-hero {
+    padding: 48px 0;
     text-align: center;
   }
-  
-  .evento-hero h1 {
-    font-size: 2rem;
+
+  .hero-badges {
+    justify-content: center;
   }
-  
-  .evento-image {
-    height: 250px;
+
+  .evento-hero .lead {
+    font-size: 0.95rem;
   }
-  
+
+  .evento-image-wrapper {
+    height: 240px;
+  }
+
   .info-card {
     padding: 20px;
+    margin-bottom: 16px;
   }
-  
-  .info-item {
-    padding: 8px;
-  }
-  
-  .btn-participar {
-    padding: 12px 24px;
-    font-size: 1rem;
-  }
-  
-  .footer {
-    margin-top: 40px;
-    padding: 20px 0;
+
+  .conteudo-container {
+    padding-top: 24px;
   }
 }
 
 @media (max-width: 576px) {
-  .evento-hero {
-    padding: 40px 0;
+  .detail-wrapper {
+    padding-top: 66px;
   }
-  
-  .evento-hero h1 {
+
+  .evento-hero {
+    padding: 36px 0;
+  }
+
+  .evento-hero .display-5 {
     font-size: 1.5rem;
   }
-  
-  .categoria-badge {
-    font-size: 0.75rem;
+
+  .evento-image-wrapper {
+    height: 200px;
+    border-radius: 12px;
+    margin-bottom: 16px;
   }
-  
-  .participantes-count {
-    font-size: 0.75rem;
+
+  .info-card {
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
   }
-  
-  .info-card h3, .info-card h4 {
-    font-size: 1.2rem;
+
+  .card-title {
+    font-size: 1rem;
+    margin-bottom: 14px;
+  }
+
+  .info-item {
+    gap: 10px;
+    padding: 8px 4px;
+  }
+
+  .btn-participar {
+    font-size: 0.95rem;
+    padding: 13px 20px;
+  }
+
+  .footer {
+    padding: 20px 16px;
   }
 }

@@ -28,7 +28,12 @@
     <div class="events-grid" *ngIf="!loading">
       <div class="event-card" *ngFor="let evento of proximosEventos" [routerLink]="['/eventos', evento.id]">
         <div class="event-image">
-          <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
+          <img *ngIf="evento.imagemPrincipal" [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome"
+               (error)="evento.imagemPrincipal = undefined">
+          <div *ngIf="!evento.imagemPrincipal" class="event-image-placeholder">
+            <i class="bi bi-tree-fill"></i>
+            <span>Sem imagem</span>
+          </div>
           <span class="event-badge">Em breve</span>
         </div>
         <div class="event-content">
@@ -70,7 +75,12 @@
     <div class="events-grid past">
       <div class="event-card past-event" *ngFor="let evento of eventosConcluidos" [routerLink]="['/eventos', evento.id]">
         <div class="event-image">
-          <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
+          <img *ngIf="evento.imagemPrincipal" [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome"
+               (error)="evento.imagemPrincipal = undefined">
+          <div *ngIf="!evento.imagemPrincipal" class="event-image-placeholder">
+            <i class="bi bi-tree-fill"></i>
+            <span>Sem imagem</span>
+          </div>
           <span class="event-badge past">Realizado</span>
         </div>
         <div class="event-content">

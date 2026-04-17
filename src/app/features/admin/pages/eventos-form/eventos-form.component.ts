@@ -29,6 +29,7 @@ export class EventoForm implements OnInit, OnDestroy {
     contato: '',
     requisitos: '',
     participantes: 0,
+    organizador: '',
     linkInscricao: ''
   };
 
@@ -62,21 +63,26 @@ export class EventoForm implements OnInit, OnDestroy {
 
   carregarEvento(): void {
     if (!this.eventoId) return;
-    
+
     this.carregandoEvento = true;
     this.subscriptions.add(
       this.eventoService.buscarEventoPorId(this.eventoId).subscribe({
         next: (evento) => {
+          // Format for datetime-local input: "YYYY-MM-DDTHH:mm"
+          const dataHoraForInput = evento.dataHora
+            ? evento.dataHora.substring(0, 16)
+            : '';
           this.evento = {
             id: evento.id,
             nome: evento.nome,
             descricao: evento.descricao,
-            dataHora: evento.dataHora.split('T')[0], // Formato para input date
+            dataHora: dataHoraForInput,
             local: evento.local,
             categoria: evento.categoria,
             contato: evento.contato,
             requisitos: evento.requisitos,
             participantes: evento.participantes,
+            organizador: evento.organizador,
             linkInscricao: evento.linkInscricao
           };
           
@@ -116,19 +122,25 @@ export class EventoForm implements OnInit, OnDestroy {
 
     let dataHoraFormatada = this.evento.dataHora;
 
-if (dataHoraFormatada && !dataHoraFormatada.includes('T')) {
-  dataHoraFormatada = `${dataHoraFormatada}T00:00:00`;
-}
+    // datetime-local gives "YYYY-MM-DDTHH:mm", backend needs full ISO
+    if (dataHoraFormatada && !dataHoraFormatada.includes(':')) {
+      dataHoraFormatada = `${dataHoraFormatada}T00:00:00`;
+    } else if (dataHoraFormatada && dataHoraFormatada.length === 16) {
+      // "YYYY-MM-DDTHH:mm" -> "YYYY-MM-DDTHH:mm:00"
+      dataHoraFormatada = `${dataHoraFormatada}:00`;
+    }
     const eventoParaEnviar: Partial<Evento> = {
       nome: this.evento.nome,
       descricao: this.evento.descricao,
       dataHora: dataHoraFormatada,
       local: this.evento.local,
-      categoria: this.evento.categoria,
+      categoria: this.evento.categoria || undefined,
       contato: this.evento.contato,
-      requisitos: this.evento.requisitos,
+      requisitos: this.evento.requisitos || undefined,
       participantes: this.evento.participantes || 0,
-      linkInscricao: this.evento.linkInscricao
+      organizador: this.evento.organizador || undefined,
+      // Only include linkInscricao if non-empty (backend validates https?://.*)
+      linkInscricao: this.evento.linkInscricao?.trim() || undefined
     };
 
   

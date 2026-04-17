@@ -1,6 +1,7 @@
 :root {
   --primary: #2E8B57;
   --primary-dark: #1d6e44;
+  --danger: #dc3545;
   --sidebar-width: 260px;
   --header-height: 60px;
 }
@@ -113,7 +114,11 @@
   color: var(--primary);
 }
 
-
+.nav-link.active {
+  background: rgba(46, 139, 87, 0.15);
+  color: var(--primary);
+  font-weight: 600;
+}
 
 .sidebar-footer {
   padding: 20px;
@@ -175,7 +180,38 @@
   padding: 24px;
 }
 
-/* Mobile Toggle */
+/* Mobile overlay backdrop */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+/* Inline menu button in top bar (desktop hidden, mobile shown) */
+.sidebar-toggle-inline {
+  display: none;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1.4rem;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-toggle-inline:hover {
+  background: rgba(46, 139, 87, 0.1);
+  color: var(--primary);
+}
+
+/* Mobile FAB Toggle (bottom right) */
 .sidebar-toggle {
   display: none;
   position: fixed;
@@ -198,27 +234,62 @@
   .sidebar {
     transform: translateX(-100%);
     transition: transform 0.3s ease;
+    z-index: 101;
   }
-  
+
   .sidebar.open {
     transform: translateX(0);
   }
-  
+
+  .sidebar-backdrop.active {
+    display: block;
+  }
+
   .main-content {
     margin-left: 0;
   }
-  
+
   .sidebar-toggle {
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
-  .top-bar {
-    padding: 12px 16px;
+
+  .sidebar-toggle-inline {
+    display: flex;
   }
-  
+
+  .top-bar {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+
+  .page-title {
+    font-size: 1.1rem;
+    flex: 1;
+  }
+
   .content-area {
-    padding: 16px;
+    padding: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .top-bar {
+    padding: 8px 12px;
+  }
+
+  .content-area {
+    padding: 12px;
+  }
+
+  .page-title {
+    font-size: 1rem;
+  }
+
+  .top-bar-actions .btn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    min-height: 36px;
   }
 }

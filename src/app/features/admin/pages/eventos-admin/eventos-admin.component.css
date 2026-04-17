@@ -1,7 +1,6 @@
 /* src/app/features/admin/pages/eventos-admin/eventos-admin.component.css */
 .eventos-admin-container {
   animation: fadeIn 0.5s ease-out;
-  margin-left: 210px;
 }
 
 @keyframes fadeIn {
@@ -140,18 +139,52 @@
   .table {
     font-size: 0.85rem;
   }
-  
+
   .evento-thumbnail {
     width: 35px;
     height: 35px;
   }
-  
+
   .btn-group .btn {
     padding: 3px 6px;
   }
-  
+
   .btn-admin {
     padding: 8px 16px;
     font-size: 0.85rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 576px) {
+  .d-flex.justify-content-between {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start !important;
+  }
+
+  .btn-admin {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 6px 8px;
+    font-size: 0.78rem;
+  }
+
+  .evento-thumbnail {
+    width: 28px;
+    height: 28px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }

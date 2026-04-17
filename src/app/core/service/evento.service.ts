@@ -43,8 +43,8 @@ export class EventoService {
     return this.http.delete<void>(`${this.apiUrl}/${idEvento}/imagem`);
   }
 
-  getImagemUrl(nomeArquivo: string | undefined): string {
-    if (!nomeArquivo) return 'assets/images/evento-placeholder.jpg';
+  getImagemUrl(nomeArquivo: string | null | undefined): string {
+    if (!nomeArquivo) return '';
     if (nomeArquivo.startsWith('http')) return nomeArquivo;
     return `http://localhost:8080/arquivos/${nomeArquivo}`;
   }

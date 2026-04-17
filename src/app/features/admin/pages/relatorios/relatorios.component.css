@@ -1,7 +1,6 @@
 /* src/app/features/admin/pages/relatorios/relatorios.component.css */
 .relatorios-container {
   animation: fadeIn 0.5s ease-out;
-  margin-left: 220px;
 }
 
 @keyframes fadeIn {
