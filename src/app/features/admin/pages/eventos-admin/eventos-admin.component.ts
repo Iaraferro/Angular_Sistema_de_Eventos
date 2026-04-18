@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 
@@ -6,6 +6,8 @@ import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Evento } from '../../../../shared/models/evento.model';
 import { EventoService } from '../../../../core/service/evento.service';
+import { AuthService } from '../../../../core/service/auth.service';
+
 
 @Component({
   selector: 'app-eventos-admin',
@@ -13,53 +15,84 @@ import { EventoService } from '../../../../core/service/evento.service';
   templateUrl: './eventos-admin.component.html',
   styleUrl: './eventos-admin.component.css',
 })
-export class EventosAdmin implements OnInit, AfterViewInit{
-  eventos: Evento[] = [];
+export class EventosAdmin implements OnInit, OnDestroy{
+  eventos: any[] = [];
   loading = true;
   excluindo = false;
+  mostrarModal = false;
   eventoParaExcluir: Evento | null = null;
-  private subscriptions: Subscription = new Subscription();
-  private modalElement: HTMLElement | null = null;
+  private subscriptions = new Subscription();
 
   constructor(
     private eventoService: EventoService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService 
   ) {}
 
   ngOnInit(): void {
     this.carregarEventos();
+    this.verificarPermissaoAdmin(); 
   }
 
-  ngAfterViewInit(): void {
-    this.modalElement = document.getElementById('modalExclusao');
+ 
+  verificarPermissaoAdmin(): void {
+    const isAdmin = this.authService.isAdmin();
+    console.log('É ADMIN?', isAdmin);
+    console.log('Usuário logado:', this.authService.getCurrentUser());
+    
+    if (!isAdmin) {
+      console.warn('Usuário não é ADMIN. Ações de exclusão/edição podem falhar!');
+    }
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-    this.fecharModalExclusao();
   }
 
   carregarEventos(): void {
     this.loading = true;
+
     this.subscriptions.add(
       this.eventoService.listarEventos().subscribe({
         next: (eventos: Evento[]) => {
-          this.eventos = eventos.sort((a, b) => 
-            new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime()
-          );
+          this.eventos = eventos
+            .sort((a, b) =>
+              new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime()
+            )
+            .map(evento => ({
+              ...evento,
+              imagemUrl: 'assets/images/evento-placeholder.jpg',
+              imagemPrincipalReal: evento.imagemPrincipal,
+              dataFormatada: new Date(evento.dataHora).toLocaleDateString('pt-BR'),
+              concluido: new Date(evento.dataHora) < new Date()
+            }));
+
           this.loading = false;
+
+          this.eventos.forEach(evento => {
+            if (evento.imagemPrincipalReal) {
+              const img = new Image();
+              img.onload = () => {
+                evento.imagemUrl = this.eventoService.getImagemUrl(evento.imagemPrincipalReal);
+              };
+              img.onerror = () => {
+                evento.imagemUrl = 'assets/images/evento-placeholder.jpg';
+              };
+              img.src = this.eventoService.getImagemUrl(evento.imagemPrincipalReal);
+            }
+          });
         },
-        error: (error: any) => {
+        error: (error) => {
           console.error('Erro ao carregar eventos:', error);
           this.loading = false;
-          alert('Erro ao carregar eventos. Tente novamente.');
+          alert('Erro ao carregar eventos.');
         }
       })
     );
   }
 
-  getImagemUrl(imagemPrincipal: string | undefined): string {
-    return this.eventoService.getImagemUrl(imagemPrincipal);
+  trackByEventoId(index: number, evento: any): number {
+    return evento.id;
   }
 
   onImageError(event: Event): void {
@@ -67,72 +100,71 @@ export class EventosAdmin implements OnInit, AfterViewInit{
     img.src = 'assets/images/evento-placeholder.jpg';
   }
 
-  formatarData(data: string | Date): string {
-    return new Date(data).toLocaleDateString('pt-BR');
-  }
-
-  isEventoConcluido(evento: Evento): boolean {
-    return new Date(evento.dataHora) < new Date();
-  }
-
-  visualizarEvento(evento: Evento): void {
+  visualizarEvento(evento: any): void {
     this.router.navigate(['/eventos', evento.id]);
   }
 
-  editarEvento(evento: Evento): void {
+  editarEvento(evento: any): void {
+    
+    if (!this.authService.isAdmin()) {
+      alert('Apenas administradores podem editar eventos.');
+      return;
+    }
     this.router.navigate(['/admin/editar-evento', evento.id]);
   }
 
-  abrirModalExclusao(evento: Evento): void {
-    this.eventoParaExcluir = evento;
-    if (this.modalElement) {
-      this.modalElement.style.display = 'block';
-      this.modalElement.classList.add('show');
-      document.body.classList.add('modal-open');
-      
-      const backdrop = document.createElement('div');
-      backdrop.className = 'modal-backdrop fade show';
-      backdrop.id = 'modalBackdrop';
-      document.body.appendChild(backdrop);
+  confirmarExclusao(evento: Evento): void {
+
+    if (!this.authService.isAdmin()) {
+      alert('Apenas administradores podem excluir eventos.');
+      return;
     }
+    this.eventoParaExcluir = evento;
+    this.mostrarModal = true;
   }
 
   fecharModalExclusao(): void {
-    if (this.modalElement) {
-      this.modalElement.style.display = 'none';
-      this.modalElement.classList.remove('show');
-      document.body.classList.remove('modal-open');
-      
-      const backdrop = document.getElementById('modalBackdrop');
-      if (backdrop) backdrop.remove();
-    }
+    this.mostrarModal = false;
     this.eventoParaExcluir = null;
-  }
-
-  confirmarExclusao(evento: Evento): void {
-    this.abrirModalExclusao(evento);
   }
 
   excluirEvento(): void {
     if (!this.eventoParaExcluir?.id) {
-      alert('Evento inválido para exclusão');
+      return;
+    }
+
+    
+    if (!this.authService.isAdmin()) {
+      alert('Você não tem permissão para excluir eventos.');
       this.fecharModalExclusao();
       return;
     }
 
     this.excluindo = true;
+    console.log('Tentando excluir evento ID:', this.eventoParaExcluir.id);
+
     this.subscriptions.add(
       this.eventoService.deletarEvento(this.eventoParaExcluir.id).subscribe({
         next: () => {
+          console.log('Evento excluído com sucesso!');
           this.excluindo = false;
           this.fecharModalExclusao();
           this.carregarEventos();
-          alert(' Evento excluído com sucesso!');
+          alert('Evento excluído com sucesso!');
         },
-        error: (error: any) => {
-          console.error('Erro ao excluir evento:', error);
+        error: (error) => {
+          console.error('Erro detalhado:', error);
           this.excluindo = false;
-          alert('Erro ao excluir evento. Tente novamente.');
+          
+          
+          if (error.status === 403) {
+            alert('Você não tem permissão para excluir eventos. Apenas administradores podem fazer isso.');
+          } else if (error.status === 401) {
+            alert('Sua sessão expirou. Faça login novamente.');
+            this.authService.logout();
+          } else {
+            alert(`Erro ao excluir evento: ${error.error?.mensagem || error.message}`);
+          }
         }
       })
     );

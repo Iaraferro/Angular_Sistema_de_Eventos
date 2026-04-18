@@ -7,9 +7,9 @@ import { authGuard } from './core/guards/auth-guard';
 import { Dashboard } from './features/admin/pages/dashboard/dashboard.component';
 import { EventosAdmin } from './features/admin/pages/eventos-admin/eventos-admin.component';
 import { EventoForm } from './features/admin/pages/eventos-form/eventos-form.component';
-import { Participantes } from './features/admin/pages/participantes/participantes.component';
 import { Relatorios } from './features/admin/pages/relatorios/relatorios.component';
 import { UsuariosComponent } from './features/admin/pages/usuarios/usuarios.component';
+import { InscricaoAdmin } from './features/admin/pages/inscricoes/inscricoes-admin.component';
 
 
 
@@ -27,8 +27,9 @@ export const routes: Routes = [
       { path: 'eventos', component: EventosAdmin, title: 'Gerenciar Eventos' },
       { path: 'novo-evento', component: EventoForm, title: 'Novo Evento' },
       { path: 'editar-evento/:id', component: EventoForm, title: 'Editar Evento' },
-      { path: 'participantes', component: Participantes, title: 'Participantes' },
       { path: 'relatorios', component: Relatorios, title: 'Relatórios' },
+       { path: 'inscricoes', component: InscricaoAdmin, title: 'Inscrições'
+  },
       { path: 'usuarios', component: UsuariosComponent, title: 'Usuários' },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]

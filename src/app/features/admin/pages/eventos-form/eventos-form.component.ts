@@ -31,7 +31,7 @@ export class EventoForm implements OnInit, OnDestroy {
     participantes: 0,
     linkInscricao: ''
   };
-
+ 
   isEditMode = false;
   eventoId: number | null = null;
   imagemFile: File | null = null;
@@ -39,13 +39,13 @@ export class EventoForm implements OnInit, OnDestroy {
   loading = false;
   carregandoEvento = false;
   private subscriptions: Subscription = new Subscription();
-
+ 
   constructor(
     private eventoService: EventoService,
     private route: ActivatedRoute,
     private router: Router
   ) {}
-
+ 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -55,11 +55,11 @@ export class EventoForm implements OnInit, OnDestroy {
       }
     });
   }
-
+ 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
+ 
   carregarEvento(): void {
     if (!this.eventoId) return;
     
@@ -67,11 +67,17 @@ export class EventoForm implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.eventoService.buscarEventoPorId(this.eventoId).subscribe({
         next: (evento) => {
+          
+        let dataFormatada = '';
+        if (evento.dataHora) {
+          const data = new Date(evento.dataHora);
+          dataFormatada = data.toISOString().split('T')[0];
+        }
           this.evento = {
             id: evento.id,
             nome: evento.nome,
             descricao: evento.descricao,
-            dataHora: evento.dataHora.split('T')[0], // Formato para input date
+            dataHora: dataFormatada,
             local: evento.local,
             categoria: evento.categoria,
             contato: evento.contato,
@@ -95,7 +101,7 @@ export class EventoForm implements OnInit, OnDestroy {
       })
     );
   }
-
+ 
   previewImagem(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
@@ -105,20 +111,23 @@ export class EventoForm implements OnInit, OnDestroy {
       reader.readAsDataURL(this.imagemFile);
     }
   }
-
+ 
   salvarEvento(): void {
     if (!this.validarFormulario()) {
       alert('Preencha todos os campos obrigatórios');
       return;
     }
-
+ 
     this.loading = true;
-
+ 
     let dataHoraFormatada = this.evento.dataHora;
-
-if (dataHoraFormatada && !dataHoraFormatada.includes('T')) {
-  dataHoraFormatada = `${dataHoraFormatada}T00:00:00`;
-}
+ 
+    if (dataHoraFormatada) {
+      if (!dataHoraFormatada.includes('T') && !dataHoraFormatada.includes(':')) {
+        dataHoraFormatada = `${dataHoraFormatada}T12:00:00`;
+      }
+    }
+ 
     const eventoParaEnviar: Partial<Evento> = {
       nome: this.evento.nome,
       descricao: this.evento.descricao,
@@ -130,11 +139,8 @@ if (dataHoraFormatada && !dataHoraFormatada.includes('T')) {
       participantes: this.evento.participantes || 0,
       linkInscricao: this.evento.linkInscricao
     };
-
-  
-
+ 
     if (this.isEditMode && this.eventoId) {
-      // Atualizar evento existente
       this.subscriptions.add(
         this.eventoService.atualizarEvento(this.eventoId, eventoParaEnviar).subscribe({
           next: (eventoAtualizado) => {
@@ -148,7 +154,6 @@ if (dataHoraFormatada && !dataHoraFormatada.includes('T')) {
         })
       );
     } else {
-      // Criar novo evento
       this.subscriptions.add(
         this.eventoService.criarEvento(eventoParaEnviar).subscribe({
           next: (eventoCriado) => {
@@ -163,29 +168,60 @@ if (dataHoraFormatada && !dataHoraFormatada.includes('T')) {
       );
     }
   }
-
+ 
   processarImagem(eventoId: number): void {
     if (this.imagemFile) {
-      this.eventoService.uploadImagem(eventoId, this.imagemFile).subscribe({
-        next: () => {
-          this.loading = false;
-          alert(this.isEditMode ? 'Evento atualizado com sucesso!' : 'Evento criado com sucesso!');
-          this.router.navigate(['/eventos', eventoId]);
+      this.eventoService.uploadImagemCloudinary(this.imagemFile).subscribe({
+        next: (response) => {
+          const publicId = response.public_id;
+          
+          let dataHoraFormatada = this.evento.dataHora;
+          if (dataHoraFormatada && !dataHoraFormatada.includes('T') && !dataHoraFormatada.includes(':')) {
+            dataHoraFormatada = `${dataHoraFormatada}T12:00:00`;
+          }
+          
+          const eventoAtualizado = {
+            nome: this.evento.nome,
+            descricao: this.evento.descricao,
+            dataHora: dataHoraFormatada,
+            local: this.evento.local,
+            categoria: this.evento.categoria,
+            contato: this.evento.contato,
+            requisitos: this.evento.requisitos,
+            participantes: this.evento.participantes || 0,
+            linkInscricao: this.evento.linkInscricao,
+            imagemPrincipal: publicId
+          };
+          
+          this.eventoService.atualizarEvento(eventoId, eventoAtualizado).subscribe({
+            next: () => {
+              this.loading = false;
+              // CORRIGIDO: navega para a lista de admin, não para o detalhe
+              this.router.navigate(['/admin/eventos']);
+            },
+            error: (error) => {
+              console.error('Erro ao atualizar evento:', error);
+              this.loading = false;
+              // CORRIGIDO: navega para a lista de admin mesmo em caso de erro
+              this.router.navigate(['/admin/eventos']);
+            }
+          });
         },
         error: (error) => {
-          console.error('Erro ao enviar imagem:', error);
+          console.error('Erro no upload:', error);
           this.loading = false;
-          alert(this.isEditMode ? 'Evento atualizado mas erro ao enviar imagem' : 'Evento criado mas erro ao enviar imagem');
-          this.router.navigate(['/eventos', eventoId]);
+          alert('Erro ao fazer upload da imagem');
+          // CORRIGIDO: navega para a lista de admin
+          this.router.navigate(['/admin/eventos']);
         }
       });
     } else {
       this.loading = false;
-      alert(this.isEditMode ? 'Evento atualizado com sucesso!' : 'Evento criado com sucesso!');
-      this.router.navigate(['/eventos', eventoId]);
+      // CORRIGIDO: navega para a lista de admin
+      this.router.navigate(['/admin/eventos']);
     }
   }
-
+ 
   validarFormulario(): boolean {
     return !!(this.evento.nome?.trim() && 
               this.evento.descricao?.trim() && 
@@ -193,15 +229,11 @@ if (dataHoraFormatada && !dataHoraFormatada.includes('T')) {
               this.evento.local?.trim() && 
               this.evento.contato?.trim());
   }
-
+ 
   cancelar(): void {
-    if (this.isEditMode) {
-      this.router.navigate(['/admin/eventos']);
-    } else {
-      this.router.navigate(['/']);
-    }
+    this.router.navigate(['/admin/eventos']);
   }
-
+ 
   voltar(): void {
     this.router.navigate(['/admin/eventos']);
   }

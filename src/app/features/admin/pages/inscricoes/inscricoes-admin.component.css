@@ -1,0 +1,192 @@
+/* src/app/features/admin/pages/inscricoes-admin/inscricoes-admin.component.css */
+.inscricoes-container {
+  animation: fadeIn 0.4s ease-out;
+  margin-left: 210px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cards */
+.card-dashboard {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.3s ease;
+}
+
+.card-dashboard:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card-header-custom {
+  padding: 16px 20px;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-body.p-0 {
+  padding: 0;
+}
+
+/* Formulários */
+.form-label {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+}
+
+.form-control, .form-select {
+  border: 1.5px solid #e9ecef;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #2E8B57;
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+  outline: none;
+}
+
+/* Tabela */
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #2E8B57;
+  color: #495057;
+  font-weight: 600;
+  padding: 14px 16px;
+  font-size: 0.85rem;
+}
+
+.table tbody td {
+  padding: 14px 16px;
+  vertical-align: middle;
+  font-size: 0.85rem;
+  color: #444;
+}
+
+.table tbody tr:hover {
+  background-color: rgba(46, 139, 87, 0.03);
+  cursor: pointer;
+}
+
+/* Tags */
+.evento-tag {
+  background: #e8f5e9;
+  color: #2E8B57;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* Badge */
+.badge.bg-success {
+  background-color: #2E8B57 !important;
+  padding: 5px 12px;
+  font-weight: 500;
+}
+
+/* Botões */
+.btn-admin {
+  border-radius: 10px;
+  padding: 10px 24px;
+  font-weight: 600;
+  transition: all 0.3s;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+}
+
+.btn-admin-primary {
+  background: linear-gradient(135deg, #2E8B57, #1d6e44);
+  color: white;
+}
+
+.btn-admin-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
+}
+
+.btn-outline-secondary {
+  background: transparent;
+  border: 1.5px solid #e9ecef;
+  color: #6c757d;
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+.btn-outline-secondary:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+  color: #495057;
+}
+
+.btn-outline-danger {
+  border: 1px solid #f8d7da;
+  color: #dc3545;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .inscricoes-container {
+    margin-left: 0;
+    padding: 0 4px;
+  }
+  
+  .card-header-custom {
+    padding: 12px 16px;
+  }
+  
+  .table thead th,
+  .table tbody td {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .btn-admin {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  
+  .evento-tag {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+  }
+}

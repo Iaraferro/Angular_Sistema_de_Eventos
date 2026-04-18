@@ -12,7 +12,8 @@ interface DashboardStats {
   eventosRealizados: number;
   totalParticipantes: number;
   eventosPorMes: { mes: string; total: number }[];
-  eventosPorCategoria: { categoria: string; total: number }[];
+  eventosPorCategoria: { categoria: string; total: number; percentual: number }[];
+  eventosRecentes: Evento[];
 }
 
 @Component({
@@ -30,10 +31,10 @@ export class Dashboard implements OnInit, OnDestroy{
     eventosRealizados: 0,
     totalParticipantes: 0,
     eventosPorMes: [],
-    eventosPorCategoria: []
+    eventosPorCategoria: [],
+    eventosRecentes: []
   };
   
-  ultimosEventos: Evento[] = [];
   private subscriptions: Subscription = new Subscription();
 
   constructor(private eventoService: EventoService) {}
@@ -52,7 +53,6 @@ export class Dashboard implements OnInit, OnDestroy{
       this.eventoService.listarEventos().subscribe({
         next: (eventos) => {
           this.calcularEstatisticas(eventos);
-          this.ultimosEventos = eventos.slice(0, 5);
           this.loading = false;
         },
         error: (error) => {
@@ -72,8 +72,13 @@ export class Dashboard implements OnInit, OnDestroy{
     // Eventos por mês (últimos 6 meses)
     const eventosPorMes = this.calcularEventosPorMes(eventos);
     
-    // Eventos por categoria
+    // Eventos por categoria com percentual
     const eventosPorCategoria = this.calcularEventosPorCategoria(eventos);
+    
+    // Últimos 5 eventos
+    const eventosRecentes = [...eventos]
+      .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
+      .slice(0, 5);
 
     this.stats = {
       totalEventos: eventos.length,
@@ -81,7 +86,8 @@ export class Dashboard implements OnInit, OnDestroy{
       eventosRealizados: eventosRealizados.length,
       totalParticipantes,
       eventosPorMes,
-      eventosPorCategoria
+      eventosPorCategoria,
+      eventosRecentes
     };
   }
 
@@ -95,26 +101,33 @@ export class Dashboard implements OnInit, OnDestroy{
       contagem[mesKey] = (contagem[mesKey] || 0) + 1;
     });
 
-    return Object.entries(contagem)
+    const ultimos6Meses = Object.entries(contagem)
+      .sort((a, b) => a[0].localeCompare(b[0]))
       .slice(-6)
       .map(([key, total]) => {
         const [ano, mes] = key.split('-');
         return { mes: `${meses[parseInt(mes)]}/${ano}`, total };
       });
+
+    return ultimos6Meses;
   }
 
-  calcularEventosPorCategoria(eventos: Evento[]): { categoria: string; total: number }[] {
+  calcularEventosPorCategoria(eventos: Evento[]): { categoria: string; total: number; percentual: number }[] {
     const contagem: { [key: string]: number } = {};
+    const totalEventos = eventos.length;
     
     eventos.forEach(evento => {
-      const categoria = evento.categoria || 'Outros';
+      const categoria = evento.categoria || 'Sem categoria';
       contagem[categoria] = (contagem[categoria] || 0) + 1;
     });
 
     return Object.entries(contagem)
-      .map(([categoria, total]) => ({ categoria, total }))
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 5);
+      .map(([categoria, total]) => ({ 
+        categoria, 
+        total,
+        percentual: totalEventos > 0 ? (total / totalEventos) * 100 : 0
+      }))
+      .sort((a, b) => b.total - a.total);
   }
 
   formatarData(data: string | Date): string {
@@ -129,14 +142,19 @@ export class Dashboard implements OnInit, OnDestroy{
     return new Date(evento.dataHora) < new Date() ? 'Realizado' : 'Em breve';
   }
 
+  
+
   getMaxEventosPorMes(): number {
-  if (!this.stats.eventosPorMes.length) return 1;
-  return Math.max(...this.stats.eventosPorMes.map(m => m.total));
-}
+    if (!this.stats.eventosPorMes.length) return 1;
+    return Math.max(...this.stats.eventosPorMes.map(m => m.total));
+  }
 
-getBarWidth(total: number): number {
-  const max = this.getMaxEventosPorMes();
-  return (total / max) * 100;
-}
+  getBarWidth(total: number): number {
+    const max = this.getMaxEventosPorMes();
+    return max > 0 ? (total / max) * 100 : 0;
+  }
 
+  isEventoRealizado(evento: Evento): boolean {
+  return new Date(evento.dataHora) < new Date();
+}
 }

@@ -141,9 +141,119 @@
         </button>
         <p class="text-muted mt-3 small">
           <i class="bi bi-info-circle me-1"></i>
-          Você será redirecionado para o formulário de inscrição
+          Preencha os seus dados para participar
         </p>
       </div>
+
+         <!-- MODAL INSCRIÇÃO -->
+<div class="modal fade" id="modalInscricao" tabindex="-1" aria-hidden="true" style="display: none;">
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content">
+      
+      <!-- HEADER -->
+      <div class="modal-header bg-success text-white border-0">
+        <div>
+          <h4 class="modal-title fw-bold mb-1">
+            <i class="bi bi-person-plus me-2"></i>
+            Inscrever-se no Evento
+          </h4>
+          <p class="text-white-50 mb-0 small">{{ evento.nome }}</p>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body p-4">
+        <form #inscricaoForm="ngForm">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-person me-1 text-success"></i>
+              Nome Completo *
+            </label>
+            <input 
+              type="text" 
+              class="form-control form-control-lg" 
+              [(ngModel)]="inscricao.nome" 
+              name="nome"
+              placeholder="Digite seu nome completo"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-envelope me-1 text-success"></i>
+              E-mail *
+            </label>
+            <input 
+              type="email" 
+              class="form-control form-control-lg" 
+              [(ngModel)]="inscricao.email" 
+              name="email"
+              placeholder="seu@email.com"
+              required>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-telephone me-1 text-success"></i>
+              Telefone *
+            </label>
+            <input 
+              type="tel" 
+              class="form-control form-control-lg" 
+              [(ngModel)]="inscricao.telefone" 
+              name="telefone"
+              placeholder="(63) 99999-9999"
+              required>
+            <div class="form-text">Ex: (63) 91234-5678</div>
+          </div>
+        </form>
+      </div>
+
+       <!-- AVISO DE PRIVACIDADE - VERSÃO COMPACTA -->
+<div class="aviso-privacidade-compact">
+  <div class="d-flex align-items-start gap-2">
+    <input 
+      type="checkbox" 
+      class="form-check-input mt-0" 
+      id="consentimento" 
+      [(ngModel)]="consentimento" 
+      name="consentimento"
+      required>
+    <div class="flex-grow-1">
+      <label class="fw-semibold small text-success" for="consentimento">
+        <i class="bi bi-shield-check me-1"></i>
+        Consentimento de dados
+      </label>
+      <p class="text-muted small mb-0 mt-1">
+        Seus dados são coletados exclusivamente para confirmação de presença e envio de informações sobre este evento.
+        <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#modalPolitica">Política de Privacidade</a>
+      </p>
+    </div>
+  </div>
+</div>
+      <!-- FOOTER -->
+      <div class="modal-footer border-0 justify-content-center gap-3 pb-4">
+        <button 
+          type="button" 
+          class="btn btn-outline-secondary px-4 py-2" 
+          data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-success px-4 py-2" 
+          (click)="salvarInscricao()" 
+          [disabled]="salvando || inscricaoForm.invalid">
+          <span *ngIf="salvando" class="spinner-border spinner-border-sm me-2"></span>
+          <i class="bi bi-check-circle me-2" *ngIf="!salvando"></i>
+          {{ salvando ? 'Salvando...' : 'Confirmar Inscrição' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
 
       <div class="info-card text-center" *ngIf="isConcluido">
         <div class="alert alert-secondary mb-0">

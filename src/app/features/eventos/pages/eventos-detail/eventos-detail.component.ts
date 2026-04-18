@@ -9,12 +9,14 @@ import { Evento } from '../../../../shared/models/evento.model';
 import { CommonModule } from '@angular/common';
 import { EventoService } from '../../../../core/service/evento.service';
 import { AuthService } from '../../../../core/service/auth.service';
+import { InscricaoService } from '../../../../core/service/inscricao.service';
+import { FormsModule } from '@angular/forms';
 
-
+declare const bootstrap: any;
 
 @Component({
   selector: 'app-eventos',
-  imports: [MatIconModule, CommonModule, RouterModule],
+  imports: [MatIconModule, CommonModule, RouterModule, FormsModule],
   templateUrl: './eventos-detail.component.html',
   styleUrl: './eventos-detail.component.css',
 })
@@ -25,11 +27,21 @@ evento: Evento | null = null;
   isConcluido = false;
   imagemHeroUrl = 'assets/images/evento-placeholder.jpg';
   imagemPrincipalUrl = 'assets/images/evento-placeholder.jpg';
-  
   private subscriptions: Subscription = new Subscription();
+  consentimento = false;
+
+  inscricao = {
+    nome: '',
+    email: '',
+    telefone: '',
+    eventoId: 0
+  };
+
+  salvando = false;
 
   constructor(
     private route: ActivatedRoute,
+    private inscricaoService: InscricaoService,
     private eventoService: EventoService,
     public authService: AuthService
   ) {}
@@ -44,6 +56,19 @@ evento: Evento | null = null;
 
     this.carregarEvento(parseInt(id));
     this.configurarBotaoVoltarTopo();
+    
+    this.carregarBootstrap();
+  }
+
+  carregarBootstrap(): void {
+    if (typeof bootstrap === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
+      script.onload = () => {
+        console.log('Bootstrap carregado');
+      };
+      document.head.appendChild(script);
+    }
   }
 
   ngOnDestroy(): void {
@@ -71,10 +96,6 @@ evento: Evento | null = null;
     );
   }
 
-  getImagemUrl(imagemPrincipal: string | undefined): string {
-    return this.eventoService.getImagemUrl(imagemPrincipal);
-  }
-
   getDataFormatada(data: string | Date): string {
     return new Date(data).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -98,16 +119,79 @@ evento: Evento | null = null;
   }
 
   participarEvento(): void {
-    if (!this.authService.isLoggedIn()) {
-      alert('🔐 Faça login para se inscrever no evento');
+   
+    
+    const user = this.authService.getCurrentUser();
+    this.inscricao = {
+      nome: user?.nome || '',
+      email: user?.email || '',
+      telefone: '',
+      eventoId: this.evento?.id || 0
+    };
+    
+    
+    const modalElement = document.getElementById('modalInscricao');
+    if (modalElement && typeof bootstrap !== 'undefined') {
+      const modal = new bootstrap.Modal(modalElement);
+      modal.show();
+    } else {
+      alert('Clique no link de inscrição para se inscrever');
+    }
+  }
+
+  salvarInscricao(): void {
+    
+    if (!this.inscricao.nome || !this.inscricao.email || !this.inscricao.telefone) {
+      alert('Preencha todos os campos');
       return;
     }
-    
-    if (this.evento?.linkInscricao) {
-      window.open(this.evento.linkInscricao, '_blank');
-    } else {
-      alert('📝 Link de inscrição não disponível no momento. Entre em contato com o organizador.');
-    }
+
+     if (!this.consentimento) {
+    alert('Você precisa autorizar o uso dos seus dados para prosseguir');
+    return;
+  }
+    this.salvando = true;
+
+    this.subscriptions.add(
+      this.inscricaoService.criarInscricao({
+        eventoId: this.inscricao.eventoId,
+        nome: this.inscricao.nome,
+        email: this.inscricao.email,
+        telefone: this.inscricao.telefone
+      }).subscribe({
+        next: () => {
+          this.salvando = false;
+          alert('Inscrição realizada com sucesso!');
+          
+         
+          const modalElement = document.getElementById('modalInscricao');
+          if (modalElement && typeof bootstrap !== 'undefined') {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+              modal.hide();
+            }
+          }
+          
+          this.inscricao = { nome: '', email: '', telefone: '', eventoId: 0 };
+          
+          if (this.evento) {
+            this.evento.participantes = (this.evento.participantes || 0) + 1;
+          }
+        },
+        error: (error) => {
+          this.salvando = false;
+          console.error('Erro na inscrição:', error);
+          
+          let mensagem = '❌ Erro ao realizar inscrição.';
+          if (error.error?.message) {
+            mensagem += ' ' + error.error.message;
+          } else if (error.error?.mensagem) {
+            mensagem += ' ' + error.error.mensagem;
+          }
+          alert(mensagem);
+        }
+      })
+    );
   }
 
   mostrarErro(): void {

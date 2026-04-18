@@ -118,7 +118,7 @@ body {
 /* Botão Participar */
 .btn-participar {
   background: linear-gradient(135deg, var(--primary), var(--dark-green));
-  color: white;
+  color: green;
   padding: 15px 30px;
   font-size: 1.1rem;
   font-weight: 600;
@@ -243,6 +243,167 @@ body {
   color: var(--primary) !important;
   width: 3rem;
   height: 3rem;
+}
+
+/* FIX: Corrige o deslocamento do modal causado pelo margin-left do container */
+.modal {
+  margin-left: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+}
+
+.modal-dialog {
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Garante que o backdrop cubra toda a tela */
+.modal-backdrop {
+  margin-left: 0 !important;
+  position: fixed !important;
+}
+
+/* Remove qualquer margin-left herdado */
+.eventos-admin-container .modal,
+.eventos-form-container .modal,
+.inscricoes-container .modal {
+  margin-left: 0 !important;
+}
+
+/* Modal Centralizado e Melhorado */
+.modal-content {
+  border: none;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  padding: 20px 24px;
+}
+
+.modal-header .modal-title {
+  font-size: 1.4rem;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-footer {
+  padding: 16px 24px 24px;
+}
+
+.modal-footer .btn {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 10px 24px;
+  min-width: 130px;
+}
+
+.modal-footer .btn-success {
+  background: linear-gradient(135deg, #2E8B57, #1d6e44);
+  border: none;
+}
+
+.modal-footer .btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+}
+
+.modal-footer .btn-outline-secondary:hover {
+  background: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+/* Inputs estilizados */
+.form-control-lg {
+  border-radius: 12px;
+  border: 1.5px solid #e9ecef;
+  padding: 12px 16px;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.form-control-lg:focus {
+  border-color: #2E8B57;
+  box-shadow: 0 0 0 3px rgba(46, 139, 87, 0.1);
+}
+
+.form-label {
+  font-size: 0.85rem;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+/* Backdrop */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+/* Aviso de Privacidade - Versão Compacta */
+.aviso-privacidade-compact {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 14px;
+  margin-top: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.aviso-privacidade-compact .form-check-input {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #2E8B57;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.aviso-privacidade-compact .form-check-input:checked {
+  background-color: #2E8B57;
+  border-color: #2E8B57;
+}
+
+.aviso-privacidade-compact label {
+  font-size: 0.8rem;
+}
+
+.aviso-privacidade-compact p {
+  font-size: 0.7rem;
+  line-height: 1.4;
+}
+
+.aviso-privacidade-compact a {
+  text-decoration: none;
+}
+
+.aviso-privacidade-compact a:hover {
+  text-decoration: underline;
+}
+/* Ajuste para o modal ficar com espaçamento correto */
+.modal-body {
+  padding: 20px 24px;
+}
+/* Responsivo */
+@media (max-width: 576px) {
+  .modal-dialog {
+    margin: 16px;
+  }
+  
+  .modal-header {
+    padding: 16px;
+  }
+  
+  .modal-body {
+    padding: 16px;
+  }
+  
+  .modal-footer {
+    padding: 12px 16px 20px;
+  }
+  
+  .modal-footer .btn {
+    padding: 8px 16px;
+    min-width: 100px;
+  }
 }
 
 /* Animações */

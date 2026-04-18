@@ -1,109 +1,114 @@
-<!-- src/app/features/admin/pages/dashboard/dashboard.component.html -->
 <div class="dashboard-container">
   <!-- Loading -->
   <div *ngIf="loading" class="text-center py-5">
     <div class="spinner-border text-success" role="status">
       <span class="visually-hidden">Carregando...</span>
     </div>
-    <p class="mt-3">Carregando estatísticas...</p>
+    <p class="mt-3 text-muted">Carregando estatísticas...</p>
   </div>
 
   <div *ngIf="!loading">
-    <!-- Cards de Estatísticas -->
-    <div class="row mb-4">
-      <div class="col-md-3 mb-3">
-        <div class="stat-card stat-card-primary">
-          <div class="stat-icon">
+    <!-- Stats Cards com design melhorado -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-primary-gradient">
             <i class="bi bi-calendar-event"></i>
           </div>
-          <div class="stat-info">
-            <h3 class="stat-value">{{ stats.totalEventos }}</h3>
-            <p class="stat-label">Total de Eventos</p>
+          <div class="stat-content">
+            <span class="stat-label">Total de Eventos</span>
+            <h2 class="stat-value">{{ stats.totalEventos }}</h2>
           </div>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="stat-card stat-card-success">
-          <div class="stat-icon">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-success-gradient">
             <i class="bi bi-calendar-check"></i>
           </div>
-          <div class="stat-info">
-            <h3 class="stat-value">{{ stats.eventosFuturos }}</h3>
-            <p class="stat-label">Eventos Futuros</p>
+          <div class="stat-content">
+            <span class="stat-label">Eventos Futuros</span>
+            <h2 class="stat-value">{{ stats.eventosFuturos }}</h2>
           </div>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="stat-card stat-card-secondary">
-          <div class="stat-icon">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-secondary-gradient">
             <i class="bi bi-calendar-x"></i>
           </div>
-          <div class="stat-info">
-            <h3 class="stat-value">{{ stats.eventosRealizados }}</h3>
-            <p class="stat-label">Eventos Realizados</p>
+          <div class="stat-content">
+            <span class="stat-label">Eventos Realizados</span>
+            <h2 class="stat-value">{{ stats.eventosRealizados }}</h2>
           </div>
         </div>
       </div>
-      <div class="col-md-3 mb-3">
-        <div class="stat-card stat-card-info">
-          <div class="stat-icon">
+      <div class="col-md-3 col-sm-6">
+        <div class="stat-card">
+          <div class="stat-icon-wrapper bg-info-gradient">
             <i class="bi bi-people"></i>
           </div>
-          <div class="stat-info">
-            <h3 class="stat-value">{{ stats.totalParticipantes }}</h3>
-            <p class="stat-label">Total Participantes</p>
+          <div class="stat-content">
+            <span class="stat-label">Total Participantes</span>
+            <h2 class="stat-value">{{ stats.totalParticipantes }}</h2>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Gráficos -->
-    <div class="row mb-4">
-      <div class="col-md-6 mb-3">
-        <div class="card-dashboard">
-          <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Eventos por Mês</h5>
+    <div class="row g-4 mb-4">
+      <!-- Eventos por Mês -->
+      <div class="col-lg-6">
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h5><i class="bi bi-graph-up me-2"></i>Eventos por Mês</h5>
+            <span class="badge bg-light text-dark">Últimos 6 meses</span>
           </div>
-          <div class="card-body">
-            <div class="chart-bars">
-              <div *ngFor="let item of stats.eventosPorMes" class="chart-bar-item">
-                <div class="chart-bar-label">{{ item.mes }}</div>
-                <div class="chart-bar-container">
-                  <div class="chart-bar" [style.width.%]="getBarWidth(item.total)"></div>
-                    <span class="chart-bar-value">{{ item.total }}</span>
+          <div class="dashboard-card-body">
+            <div class="chart-container" *ngIf="stats.eventosPorMes.length > 0">
+              <div *ngFor="let item of stats.eventosPorMes" class="chart-item">
+                <div class="chart-label">
+                  <span>{{ item.mes }}</span>
+                  <span class="chart-value">{{ item.total }} evento(s)</span>
+                </div>
+                <div class="progress-bar-custom">
+                  <div class="progress-fill" [style.width.%]="getBarWidth(item.total)">
+                    <span class="progress-number" *ngIf="item.total > 0">{{ item.total }}</span>
                   </div>
                 </div>
               </div>
-              <div *ngIf="stats.eventosPorMes.length === 0" class="text-center text-muted py-4">
-                Nenhum dado disponível
-              </div>
+            </div>
+            <div *ngIf="stats.eventosPorMes.length === 0" class="empty-state">
+              <i class="bi bi-bar-chart-line"></i>
+              <p>Nenhum dado disponível</p>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-6 mb-3">
-        <div class="card-dashboard">
-          <div class="card-header bg-success text-white">
-            <h5 class="mb-0"><i class="bi bi-pie-chart me-2"></i>Eventos por Categoria</h5>
+
+      <!-- Eventos por Categoria -->
+      <div class="col-lg-6">
+        <div class="dashboard-card">
+          <div class="dashboard-card-header">
+            <h5><i class="bi bi-pie-chart me-2"></i>Eventos por Categoria</h5>
           </div>
-          <div class="card-body">
-            <div class="categorias-list">
-              <div *ngFor="let item of stats.eventosPorCategoria" class="categoria-item">
-                <div class="categoria-info">
-                  <span class="categoria-nome">{{ item.categoria }}</span>
-                  <span class="categoria-total">{{ item.total }} evento(s)</span>
+          <div class="dashboard-card-body">
+            <div class="categories-container" *ngIf="stats.eventosPorCategoria.length > 0">
+              <div *ngFor="let item of stats.eventosPorCategoria" class="category-item">
+                <div class="category-header">
+                  <span class="category-name">{{ item.categoria }}</span>
+                  <span class="category-count">{{ item.total }} evento(s)</span>
                 </div>
-                <div class="progress">
-                  <div class="progress-bar bg-success" 
-                       [style.width.%]="(item.total / stats.totalEventos) * 100"
-                       [attr.aria-valuenow]="(item.total / stats.totalEventos) * 100"
-                       aria-valuemin="0" aria-valuemax="100">
-                  </div>
+                <div class="progress-bar-custom">
+                  <div class="progress-fill bg-success" [style.width.%]="item.percentual"></div>
                 </div>
+                <div class="category-percentual">{{ item.percentual | number:'1.0-0' }}%</div>
               </div>
-              <div *ngIf="stats.eventosPorCategoria.length === 0" class="text-center text-muted py-4">
-                Nenhum dado disponível
-              </div>
+            </div>
+            <div *ngIf="stats.eventosPorCategoria.length === 0" class="empty-state">
+              <i class="bi bi-pie-chart"></i>
+              <p>Nenhuma categoria cadastrada</p>
             </div>
           </div>
         </div>
@@ -111,17 +116,18 @@
     </div>
 
     <!-- Últimos Eventos -->
-    <div class="card-dashboard">
-      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Últimos Eventos</h5>
-        <a routerLink="/admin/eventos" class="btn btn-sm btn-light">Ver todos</a>
+    <div class="dashboard-card">
+      <div class="dashboard-card-header">
+        <h5><i class="bi bi-clock-history me-2"></i>Últimos Eventos</h5>
+        <a routerLink="/admin/eventos" class="btn-link">Ver todos →</a>
       </div>
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead class="table-light">
+      <div class="dashboard-card-body p-0">
+        <div class="table-responsive" *ngIf="stats.eventosRecentes.length > 0">
+          <table class="custom-table">
+            <thead>
               <tr>
                 <th>Evento</th>
+                <th>Categoria</th>
                 <th>Data</th>
                 <th>Local</th>
                 <th>Participantes</th>
@@ -129,33 +135,34 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let evento of ultimosEventos">
+              <tr *ngFor="let evento of stats.eventosRecentes">
                 <td>
-                  <strong>{{ evento.nome }}</strong>
-                  <br>
-                  <small class="text-muted">{{ evento.categoria }}</small>
+                  <div class="evento-cell">
+                    <strong>{{ evento.nome }}</strong>
+                  </div>
                 </td>
+                <td><span class="category-tag">{{ evento.categoria || 'Geral' }}</span></td>
                 <td>{{ formatarData(evento.dataHora) }}</td>
                 <td>{{ evento.local }}</td>
-                <td>{{ evento.participantes || 0 }}</td>
+                <td><span class="participants-badge">{{ evento.participantes || 0 }}</span></td>
                 <td>
-                  <span [class]="'badge ' + getStatusClass(evento)">
+                  <span class="status-badge" [class.status-future]="!isEventoRealizado(evento)" 
+                        [class.status-past]="isEventoRealizado(evento)">
                     {{ getStatusTexto(evento) }}
                   </span>
-                </td>
-              </tr>
-              <tr *ngIf="ultimosEventos.length === 0">
-                <td colspan="5" class="text-center py-4">
-                  <i class="bi bi-inbox display-6 text-muted"></i>
-                  <p class="text-muted mt-2">Nenhum evento cadastrado ainda</p>
-                  <a routerLink="/admin/novo-evento" class="btn btn-success btn-sm">
-                    Criar primeiro evento
-                  </a>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <div *ngIf="stats.eventosRecentes.length === 0" class="empty-state p-5">
+          <i class="bi bi-calendar-x display-4 text-muted"></i>
+          <p class="mt-3">Nenhum evento cadastrado ainda</p>
+          <a routerLink="/admin/novo-evento" class="btn btn-success btn-sm">
+            Criar primeiro evento
+          </a>
+        </div>
       </div>
     </div>
   </div>
+</div>
