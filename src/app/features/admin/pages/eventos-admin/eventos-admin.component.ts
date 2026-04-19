@@ -19,8 +19,6 @@ export class EventosAdmin implements OnInit, OnDestroy{
   eventos: any[] = [];
   loading = true;
   excluindo = false;
-  mostrarModal = false;
-  eventoParaExcluir: Evento | null = null;
   private subscriptions = new Subscription();
 
   constructor(
@@ -31,18 +29,6 @@ export class EventosAdmin implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.carregarEventos();
-    this.verificarPermissaoAdmin(); 
-  }
-
- 
-  verificarPermissaoAdmin(): void {
-    const isAdmin = this.authService.isAdmin();
-    console.log('É ADMIN?', isAdmin);
-    console.log('Usuário logado:', this.authService.getCurrentUser());
-    
-    if (!isAdmin) {
-      console.warn('Usuário não é ADMIN. Ações de exclusão/edição podem falhar!');
-    }
   }
 
   ngOnDestroy(): void {
@@ -56,9 +42,7 @@ export class EventosAdmin implements OnInit, OnDestroy{
       this.eventoService.listarEventos().subscribe({
         next: (eventos: Evento[]) => {
           this.eventos = eventos
-            .sort((a, b) =>
-              new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime()
-            )
+            .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
             .map(evento => ({
               ...evento,
               imagemUrl: 'assets/images/evento-placeholder.jpg',
@@ -105,7 +89,6 @@ export class EventosAdmin implements OnInit, OnDestroy{
   }
 
   editarEvento(evento: any): void {
-    
     if (!this.authService.isAdmin()) {
       alert('Apenas administradores podem editar eventos.');
       return;
@@ -113,52 +96,36 @@ export class EventosAdmin implements OnInit, OnDestroy{
     this.router.navigate(['/admin/editar-evento', evento.id]);
   }
 
-  confirmarExclusao(evento: Evento): void {
-
+  // ✅ SIMPLES E FUNCIONAL! Sem modal complicado
+  excluirEvento(id: number, nome: string): void {
     if (!this.authService.isAdmin()) {
       alert('Apenas administradores podem excluir eventos.');
       return;
     }
-    this.eventoParaExcluir = evento;
-    this.mostrarModal = true;
-  }
 
-  fecharModalExclusao(): void {
-    this.mostrarModal = false;
-    this.eventoParaExcluir = null;
-  }
+    // Confirm nativo do navegador - funciona SEMPRE!
+    const confirmar = window.confirm(`Tem certeza que deseja excluir o evento "${nome}"?\n\n⚠️ Esta ação não pode ser desfeita!`);
 
-  excluirEvento(): void {
-    if (!this.eventoParaExcluir?.id) {
-      return;
-    }
-
-    
-    if (!this.authService.isAdmin()) {
-      alert('Você não tem permissão para excluir eventos.');
-      this.fecharModalExclusao();
+    if (!confirmar) {
       return;
     }
 
     this.excluindo = true;
-    console.log('Tentando excluir evento ID:', this.eventoParaExcluir.id);
 
     this.subscriptions.add(
-      this.eventoService.deletarEvento(this.eventoParaExcluir.id).subscribe({
+      this.eventoService.deletarEvento(id).subscribe({
         next: () => {
           console.log('Evento excluído com sucesso!');
           this.excluindo = false;
-          this.fecharModalExclusao();
           this.carregarEventos();
-          alert('Evento excluído com sucesso!');
+          alert('✅ Evento excluído com sucesso!');
         },
         error: (error) => {
           console.error('Erro detalhado:', error);
           this.excluindo = false;
           
-          
           if (error.status === 403) {
-            alert('Você não tem permissão para excluir eventos. Apenas administradores podem fazer isso.');
+            alert(' Você não tem permissão para excluir eventos. Apenas administradores podem fazer isso.');
           } else if (error.status === 401) {
             alert('Sua sessão expirou. Faça login novamente.');
             this.authService.logout();

@@ -1,8 +1,10 @@
 .dashboard-container {
   animation: fadeIn 0.4s ease-out;
-  margin-left: 210px;
   padding: 0 4px;
+  margin-left: 200px;
 }
+
+
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

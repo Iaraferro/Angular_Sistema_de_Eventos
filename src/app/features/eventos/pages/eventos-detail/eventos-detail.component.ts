@@ -21,7 +21,7 @@ declare const bootstrap: any;
   styleUrl: './eventos-detail.component.css',
 })
 export class Eventos implements OnInit, OnDestroy{
-evento: Evento | null = null;
+ evento: Evento | null = null;
   loading = true;
   error = false;
   isConcluido = false;
@@ -29,6 +29,7 @@ evento: Evento | null = null;
   imagemPrincipalUrl = 'assets/images/evento-placeholder.jpg';
   private subscriptions: Subscription = new Subscription();
   consentimento = false;
+  private modalInstance: any = null;
 
   inscricao = {
     nome: '',
@@ -56,24 +57,28 @@ evento: Evento | null = null;
 
     this.carregarEvento(parseInt(id));
     this.configurarBotaoVoltarTopo();
-    
-    this.carregarBootstrap();
   }
 
-  carregarBootstrap(): void {
-    if (typeof bootstrap === 'undefined') {
-      const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js';
-      script.onload = () => {
-        console.log('Bootstrap carregado');
-      };
-      document.head.appendChild(script);
+  ngAfterViewInit(): void {
+    // ✅ CORRIGIDO: Não carregar Bootstrap dinamicamente, assumir que já está no index.html
+    this.inicializarModal();
+  }
+
+  private inicializarModal(): void {
+    const modalElement = document.getElementById('modalInscricao');
+    if (modalElement && typeof bootstrap !== 'undefined') {
+      this.modalInstance = new bootstrap.Modal(modalElement);
     }
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     window.removeEventListener('scroll', this.handleScroll.bind(this));
+    
+    // Fecha modal se estiver aberto
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
   }
 
   carregarEvento(id: number): void {
@@ -96,6 +101,93 @@ evento: Evento | null = null;
     );
   }
 
+  participarEvento(): void {
+    const user = this.authService.getCurrentUser();
+    this.inscricao = {
+      nome: user?.nome || '',
+      email: user?.email || '',
+      telefone: '',
+      eventoId: this.evento?.id || 0
+    };
+    this.consentimento = false;
+    
+    // ✅ CORRIGIDO: Usa instância do modal
+    if (this.modalInstance) {
+      this.modalInstance.show();
+    } else {
+      // Fallback
+      const modalElement = document.getElementById('modalInscricao');
+      if (modalElement && typeof bootstrap !== 'undefined') {
+        this.modalInstance = new bootstrap.Modal(modalElement);
+        this.modalInstance.show();
+      } else {
+        alert('Sistema temporariamente indisponível. Tente novamente.');
+      }
+    }
+  }
+
+  salvarInscricao(): void {
+  if (!this.inscricao.nome || !this.inscricao.email || !this.inscricao.telefone) {
+    alert('Preencha todos os campos');
+    return;
+  }
+
+  if (!this.consentimento) {
+    alert('Você precisa autorizar o uso dos seus dados para prosseguir');
+    return;
+  }
+  
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(this.inscricao.email)) {
+    alert('Digite um e-mail válido');
+    return;
+  }
+  
+  this.salvando = true;
+
+  // ✅ CORRIGIDO: Remove campos que não existem no DTO
+  this.subscriptions.add(
+    this.inscricaoService.criarInscricao({
+      eventoId: this.inscricao.eventoId,
+      nome: this.inscricao.nome,
+      email: this.inscricao.email,
+      telefone: this.inscricao.telefone
+    }).subscribe({
+      next: () => {
+        this.salvando = false;
+        alert('✅ Inscrição realizada com sucesso!');
+        
+        if (this.modalInstance) {
+          this.modalInstance.hide();
+        }
+        
+        this.inscricao = { nome: '', email: '', telefone: '', eventoId: 0 };
+        this.consentimento = false;
+        
+        if (this.evento) {
+          this.evento.participantes = (this.evento.participantes || 0) + 1;
+        }
+      },
+      error: (error) => {
+        this.salvando = false;
+        console.error('Erro na inscrição:', error);
+        
+        let mensagem = '❌ Erro ao realizar inscrição.';
+        if (error.status === 409) {
+          mensagem = '❌ Você já está inscrito neste evento!';
+        } else if (error.error?.message) {
+          mensagem += ' ' + error.error.message;
+        }
+        alert(mensagem);
+      }
+    })
+  );
+}
+  mostrarErro(): void {
+    this.loading = false;
+    this.error = true;
+  }
+
   getDataFormatada(data: string | Date): string {
     return new Date(data).toLocaleDateString('pt-BR', {
       day: '2-digit',
@@ -116,87 +208,6 @@ evento: Evento | null = null;
     return this.evento.descricao.length > 150 
       ? this.evento.descricao.substring(0, 150) + '...' 
       : this.evento.descricao;
-  }
-
-  participarEvento(): void {
-   
-    
-    const user = this.authService.getCurrentUser();
-    this.inscricao = {
-      nome: user?.nome || '',
-      email: user?.email || '',
-      telefone: '',
-      eventoId: this.evento?.id || 0
-    };
-    
-    
-    const modalElement = document.getElementById('modalInscricao');
-    if (modalElement && typeof bootstrap !== 'undefined') {
-      const modal = new bootstrap.Modal(modalElement);
-      modal.show();
-    } else {
-      alert('Clique no link de inscrição para se inscrever');
-    }
-  }
-
-  salvarInscricao(): void {
-    
-    if (!this.inscricao.nome || !this.inscricao.email || !this.inscricao.telefone) {
-      alert('Preencha todos os campos');
-      return;
-    }
-
-     if (!this.consentimento) {
-    alert('Você precisa autorizar o uso dos seus dados para prosseguir');
-    return;
-  }
-    this.salvando = true;
-
-    this.subscriptions.add(
-      this.inscricaoService.criarInscricao({
-        eventoId: this.inscricao.eventoId,
-        nome: this.inscricao.nome,
-        email: this.inscricao.email,
-        telefone: this.inscricao.telefone
-      }).subscribe({
-        next: () => {
-          this.salvando = false;
-          alert('Inscrição realizada com sucesso!');
-          
-         
-          const modalElement = document.getElementById('modalInscricao');
-          if (modalElement && typeof bootstrap !== 'undefined') {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-              modal.hide();
-            }
-          }
-          
-          this.inscricao = { nome: '', email: '', telefone: '', eventoId: 0 };
-          
-          if (this.evento) {
-            this.evento.participantes = (this.evento.participantes || 0) + 1;
-          }
-        },
-        error: (error) => {
-          this.salvando = false;
-          console.error('Erro na inscrição:', error);
-          
-          let mensagem = '❌ Erro ao realizar inscrição.';
-          if (error.error?.message) {
-            mensagem += ' ' + error.error.message;
-          } else if (error.error?.mensagem) {
-            mensagem += ' ' + error.error.mensagem;
-          }
-          alert(mensagem);
-        }
-      })
-    );
-  }
-
-  mostrarErro(): void {
-    this.loading = false;
-    this.error = true;
   }
 
   private configurarBotaoVoltarTopo(): void {

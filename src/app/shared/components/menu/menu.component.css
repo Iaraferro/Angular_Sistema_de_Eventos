@@ -1,53 +1,151 @@
 /* src/app/shared/components/menu/menu.component.css */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap');
+
 .navbar {
-  background-color: #2E8B57;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  background: rgba(24, 47, 29, 0.85);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.22);
   padding: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Navbar sólida ao rolar (JS pode adicionar a classe .scrolled) */
+.navbar.scrolled {
+  background: rgba(10, 18, 12, 0.98);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.32);
 }
 
 .navbar-brand {
-  font-size: 1.3rem;
-  padding: 12px 0;
+  font-family: 'Fraunces', serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: white !important;
+  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: -0.3px;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.navbar-brand:hover {
+  opacity: 0.88;
 }
 
 .navbar-brand i {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  color: #6ee49a;
+}
+
+/* Nav Links */
+.navbar-nav {
+  gap: 4px;
+  align-items: center;
+  background: transparent;
 }
 
 .navbar-nav .nav-link {
-  color: white;
-  padding: 12px 16px;
-  transition: all 0.3s;
+  font-family: 'DM Sans', sans-serif;
+  color: rgba(255, 255, 255, 0.82) !important;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  transition: all 0.22s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
 }
 
 .navbar-nav .nav-link:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  color: white !important;
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .navbar-nav .nav-link.active {
+  color: white !important;
   font-weight: 600;
-  background-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.16);
 }
 
+/* Botão de Login — sutil, apenas borda */
+.navbar-nav .nav-link.nav-link-cta {
+  color: rgba(255, 255, 255, 0.82) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28);
+  padding: 7px 18px;
+  border-radius: 10px;
+  margin-left: 4px;
+}
+
+.navbar-nav .nav-link.nav-link-cta:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+/* Badge admin */
+.navbar-nav .nav-link .bi-shield-lock {
+  color: #ffd47a;
+}
+
+/* Garante que nenhum elemento interno herde fundo esverdeado do Bootstrap */
+.navbar-collapse,
+.navbar > .container,
+.navbar > .container-fluid {
+  background: transparent !important;
+}
+
+/* Toggler */
 .navbar-toggler {
-  border-color: rgba(255, 255, 255, 0.5);
-  padding: 8px 12px;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  padding: 7px 11px;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.navbar-toggler:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 3px rgba(110, 228, 154, 0.25);
 }
 
 .navbar-toggler-icon {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* Mobile - remove fundo branco e bordas */
-@media (max-width: 768px) {
+/* ============================================
+   MOBILE
+   ============================================ */
+@media (max-width: 991px) {
   .navbar-collapse {
-    background-color: #2E8B57;
-    margin-top: 0;
+    background: rgba(10, 18, 12, 0.98);
+    border-radius: 0 0 18px 18px;
+    padding: 12px 8px 20px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.3);
   }
-  
+
+  .navbar-nav {
+    gap: 2px;
+  }
+
   .navbar-nav .nav-link {
-    padding: 12px 16px;
-    border-radius: 0;
+    padding: 11px 16px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+  }
+
+  .navbar-nav .nav-link.nav-link-cta {
+    margin: 8px 0 0;
+    justify-content: center;
+    border-radius: 12px;
   }
 }
-

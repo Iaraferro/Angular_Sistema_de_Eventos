@@ -12,7 +12,7 @@ import { AuthService } from '../../../../core/service/auth.service';
   styleUrl: './login.css',
 })
 export class Login implements OnInit {
-  username = '';
+ username = '';
   senha = '';
   loading = false;
   errorMessage = '';
@@ -24,8 +24,12 @@ export class Login implements OnInit {
   ) {}
 
   ngOnInit(): void {
-      
+    // ✅ Se já estiver logado, redireciona
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/admin/dashboard']);
+    }
   }
+  
   login(): void {
     if (!this.username || !this.senha) {
       this.errorMessage = 'Preencha usuário e senha';
@@ -35,16 +39,13 @@ export class Login implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    // CORRIGIDO: Removeu o objeto com logout fictício
+    // ✅ CORRIGIDO: Removeu o objeto com logout fictício
     this.authService.login({
       username: this.username,
-      senha: this.senha,
-      logout: function (): unknown {
-        throw new Error('Function not implemented.');
-      }
+      senha: this.senha
     }).subscribe({
-      next: (response) => {
-        console.log('Login successful', response);
+      next: (user) => {
+        console.log('Login successful', user);
         this.router.navigate(['/admin/dashboard']);
       },
       error: (error) => {

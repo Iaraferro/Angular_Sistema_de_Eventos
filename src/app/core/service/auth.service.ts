@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Auth, UsuarioResponse } from '../../shared/models/auth.model';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap, throwError } from 'rxjs';
+import { Auth, AuthResponse, UsuarioResponse } from '../../shared/models/auth.model';
+import { environment } from '../../../environments/environment';
 
 
 
@@ -10,7 +11,7 @@ import { Auth, UsuarioResponse } from '../../shared/models/auth.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8080';
+ private apiUrl = environment.apiUrl;
   private tokenKey = 'auth_token';
   private userKey = 'current_user';
   
@@ -33,26 +34,37 @@ export class AuthService {
     }
   }
 
-  login(credentials: Auth): Observable<string> {
-    return this.http.post(`${this.apiUrl}/auth`, credentials, { responseType: 'text' }).pipe(
-      tap(token => {
-        if (token) {
-          this.setToken(token);
-          this.fetchCurrentUser(token).subscribe();
-        }
-      })
-    );
+  login(credentials: Auth): Observable<UsuarioResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/auth`, credentials)
+      .pipe(
+        tap(response => {
+          if (response.token) {
+            this.setToken(response.token);
+            this.setCurrentUser(response.user);
+          }
+        }),
+        map(response => response.user)
+      );
   }
 
-  fetchCurrentUser(token: string): Observable<UsuarioResponse> {
-    return this.http.get<UsuarioResponse>(`${this.apiUrl}/usuarios/perfil`, {
-      headers: { Authorization: `Bearer ${token}` }
-    }).pipe(
-      tap(user => {
-        localStorage.setItem(this.userKey, JSON.stringify(user));
-        this.currentUserSubject.next(user);
-      })
-    );
+  private setCurrentUser(user: UsuarioResponse): void {
+    localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.currentUserSubject.next(user);
+  }
+
+  fetchCurrentUser(): Observable<UsuarioResponse> {
+    const token = this.getToken();
+    if (!token) {
+      throw new Error('No token');
+    }
+    
+    return this.http.get<UsuarioResponse>(`${this.apiUrl}/usuarios/perfil`)
+      .pipe(
+        tap(user => {
+          localStorage.setItem(this.userKey, JSON.stringify(user));
+          this.currentUserSubject.next(user);
+        })
+      );
   }
 
   logout(): void {
@@ -80,10 +92,28 @@ export class AuthService {
 
   isAdmin(): boolean {
     const user = this.currentUserSubject.value;
-    return user?.perfil?.nome === 'Adm';
+    return user?.perfil?.nome?.toLowerCase() === 'adm';
   }
 
   getCurrentUser(): UsuarioResponse | null {
     return this.currentUserSubject.value;
+  }
+
+  // Adicione este método - verifica se o token é válido
+verifyToken(): Observable<boolean> {
+    const token = this.getToken();
+    if (!token) return of(false);
+    return of(true);
+  }
+
+  
+  refreshToken(): Observable<string> {
+    // Se não tem endpoint de refresh, só retorna o token atual
+    const token = this.getToken();
+    if (token) {
+      return of(token);
+    }
+    this.logout();
+    return throwError(() => new Error('No token to refresh'));
   }
 }

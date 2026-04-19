@@ -7,9 +7,7 @@
       Gerenciar Eventos
     </h2>
 
-    <button
-      class="btn btn-admin btn-admin-primary"
-      routerLink="/admin/novo-evento">
+    <button class="btn btn-admin btn-admin-primary" routerLink="/admin/novo-evento">
       <i class="bi bi-plus-circle me-2"></i>
       Novo Evento
     </button>
@@ -43,76 +41,45 @@
             </tr>
           </thead>
           <tbody>
-            <!-- LISTA -->
             <tr *ngFor="let evento of eventos; trackBy: trackByEventoId">
               <td>{{ evento.id }}</td>
               <td>
                 <div class="thumbnail-container">
-                  <img
-                    [src]="evento.imagemUrl"
-                    [alt]="evento.nome"
-                    class="evento-thumbnail"
-                    loading="lazy"
-                    (error)="onImageError($event)">
+                  <img [src]="evento.imagemUrl" [alt]="evento.nome" class="evento-thumbnail" loading="lazy" (error)="onImageError($event)">
                 </div>
               </td>
               <td>
                 <strong>{{ evento.nome }}</strong>
                 <br>
-                <small class="text-muted">
-                  {{ evento.categoria || 'Sem categoria' }}
-                </small>
+                <small class="text-muted">{{ evento.categoria || 'Sem categoria' }}</small>
               </td>
               <td>{{ evento.dataFormatada }}</td>
               <td>{{ evento.local }}</td>
+              <td><span class="badge bg-success">{{ evento.participantes || 0 }}</span></td>
               <td>
-                <span class="badge bg-success">
-                  {{ evento.participantes || 0 }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="badge"
-                  [ngClass]="evento.concluido ? 'bg-secondary' : 'bg-primary'">
+                <span class="badge" [ngClass]="evento.concluido ? 'bg-secondary' : 'bg-primary'">
                   {{ evento.concluido ? 'Realizado' : 'Em breve' }}
                 </span>
               </td>
               <td>
                 <div class="btn-group btn-group-sm">
-                  <button
-                    class="btn btn-outline-primary"
-                    title="Visualizar"
-                    (click)="visualizarEvento(evento)">
+                  <button class="btn btn-outline-primary" title="Visualizar" (click)="visualizarEvento(evento)">
                     <i class="bi bi-eye"></i>
                   </button>
-                  <button
-                    class="btn btn-outline-warning"
-                    title="Editar"
-                    (click)="editarEvento(evento)">
+                  <button class="btn btn-outline-warning" title="Editar" (click)="editarEvento(evento)">
                     <i class="bi bi-pencil"></i>
                   </button>
-                  <button
-                    class="btn btn-outline-danger"
-                    title="Excluir"
-                    (click)="confirmarExclusao(evento)">
+                  <button class="btn btn-outline-danger" title="Excluir" (click)="excluirEvento(evento.id, evento.nome)">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
               </td>
             </tr>
-
-            <!-- SEM EVENTOS -->
             <tr *ngIf="eventos.length === 0">
               <td colspan="8" class="text-center py-5">
                 <i class="bi bi-inbox display-4 text-muted"></i>
-                <p class="text-muted mt-2">
-                  Nenhum evento cadastrado ainda.
-                </p>
-                <button
-                  class="btn btn-success btn-sm"
-                  routerLink="/admin/novo-evento">
-                  Criar primeiro evento
-                </button>
+                <p class="text-muted mt-2">Nenhum evento cadastrado ainda.</p>
+                <button class="btn btn-success btn-sm" routerLink="/admin/novo-evento">Criar primeiro evento</button>
               </td>
             </tr>
           </tbody>
@@ -122,58 +89,4 @@
   </div>
 </div>
 
-<!-- MODAL -->
-<div
-  *ngIf="mostrarModal"
-  class="modal fade show d-block"
-  tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          Confirmar Exclusão
-        </h5>
-        <button
-          type="button"
-          class="btn-close btn-close-white"
-          (click)="fecharModalExclusao()">
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>
-          Tem certeza que deseja excluir o evento
-          <strong>{{ eventoParaExcluir?.nome }}</strong>?
-        </p>
-        <p class="text-danger small">
-          ⚠️ Esta ação não pode ser desfeita.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          (click)="fecharModalExclusao()">
-          Cancelar
-        </button>
-        <button
-          type="button"
-          class="btn btn-danger"
-          [disabled]="excluindo"
-          (click)="excluirEvento()">
-          <span
-            *ngIf="excluindo"
-            class="spinner-border spinner-border-sm me-2">
-          </span>
-          Sim, excluir
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- BACKDROP -->
-<div
-  *ngIf="mostrarModal"
-  class="modal-backdrop fade show">
-</div>
+<!-- SEM MODAL - SEM BACKDROP - SEM DOR DE CABEÇA! -->

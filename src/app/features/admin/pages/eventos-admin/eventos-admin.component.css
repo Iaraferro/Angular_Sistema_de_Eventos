@@ -170,6 +170,41 @@
   box-shadow: 0 4px 12px rgba(46, 139, 87, 0.3);
 }
 
+/* CORREÇÃO DO MODAL - Garante que o modal funcione corretamente */
+.modal {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-backdrop {
+  z-index: 1040 !important;
+}
+
+.modal {
+  z-index: 1050 !important;
+}
+
+/* Garante que o modal fique sobreposto corretamente */
+.modal-dialog {
+  z-index: 1060 !important;
+  pointer-events: auto;
+}
+
+.modal-content {
+  pointer-events: auto;
+}
+
+/* Remove o backdrop manual que você criou */
+.modal-backdrop.fade.show:not(.modal-backdrop) {
+  display: none;
+}
+
+
 /* Responsive */
 @media (max-width: 768px) {
   .table {

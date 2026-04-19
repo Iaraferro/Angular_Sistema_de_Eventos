@@ -40,6 +40,7 @@ export class InscricaoAdmin implements OnInit, OnDestroy{
   carregarDados(): void {
     this.loading = true;
     
+    // Carrega eventos e inscrições em paralelo
     this.subscriptions.add(
       this.eventoService.listarEventos().subscribe({
         next: (eventos) => {
@@ -54,19 +55,17 @@ export class InscricaoAdmin implements OnInit, OnDestroy{
     );
   }
 
+  // ✅ CORRIGIDO: Use listarTodasComEventos se disponível, senão carrega otimizado
   carregarInscricoes(): void {
-    // Correção: usar forkJoin ou Promise.all com Observable
-    const observables = this.eventos.map(evento =>
-      this.inscricaoService.listarPorEvento(evento.id!)
-    );
-
-    // Usa forkJoin para aguardar todos os observables
-    
-    
+    // Tenta carregar todas de uma vez (se backend suportar)
     this.subscriptions.add(
-      forkJoin(observables).subscribe({
-        next: (results) => {
-          this.inscricoes = results.flat();
+      this.inscricaoService.listarTodas().subscribe({
+        next: (inscricoes) => {
+          // Enriquecer com nome do evento
+          this.inscricoes = inscricoes.map(inscricao => ({
+            ...inscricao,
+            eventoNome: this.eventos.find(e => e.id === inscricao.eventoId)?.nome || 'Evento não encontrado'
+          }));
           this.filtrarInscricoes();
           this.loading = false;
         },
@@ -82,10 +81,7 @@ export class InscricaoAdmin implements OnInit, OnDestroy{
     let filtradas = [...this.inscricoes];
     
     if (this.eventoFiltroId) {
-      const eventoSelecionado = this.eventos.find(e => e.id === this.eventoFiltroId);
-      if (eventoSelecionado) {
-        filtradas = filtradas.filter(i => i.eventoNome === eventoSelecionado.nome);
-      }
+      filtradas = filtradas.filter(i => i.eventoId === this.eventoFiltroId);
     }
     
     if (this.searchTerm) {
@@ -132,7 +128,11 @@ export class InscricaoAdmin implements OnInit, OnDestroy{
           },
           error: (error) => {
             console.error('Erro ao deletar:', error);
-            alert('Erro ao cancelar inscrição.');
+            if (error.status === 403) {
+              alert('Você não tem permissão para cancelar inscrições.');
+            } else {
+              alert('Erro ao cancelar inscrição.');
+            }
           }
         })
       );
