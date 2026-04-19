@@ -21,7 +21,7 @@ declare const bootstrap: any;
   styleUrl: './eventos-detail.component.css',
 })
 export class Eventos implements OnInit, OnDestroy{
- evento: Evento | null = null;
+  evento: Evento | null = null;
   loading = true;
   error = false;
   isConcluido = false;
@@ -30,6 +30,7 @@ export class Eventos implements OnInit, OnDestroy{
   private subscriptions: Subscription = new Subscription();
   consentimento = false;
   private modalInstance: any = null;
+  modalAberto = false;
 
   inscricao = {
     nome: '',

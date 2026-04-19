@@ -14,9 +14,10 @@ import { AuthService } from '../../core/service/auth.service';
   styleUrl: './home.css',
 })
 export class Home implements OnInit, OnDestroy{
- proximosEventos: Evento[] = [];
+  proximosEventos: Evento[] = [];
   eventosConcluidos: Evento[] = [];
   loading = true;
+  activeTab: 'proximos' | 'realizados' = 'proximos';
   private subscriptions: Subscription = new Subscription();
 
   constructor(
