@@ -9,8 +9,7 @@ import { Evento } from '../../../../shared/models/evento.model';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { EventoService } from '../../../../core/service/evento.service';
 import { Subscription } from 'rxjs';
-
-
+import { ToastService } from '../../../../shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-novo-evento',
@@ -29,9 +28,9 @@ export class EventoForm implements OnInit, OnDestroy {
     contato: '',
     requisitos: '',
     participantes: 0,
-    linkInscricao: ''
+    linkInscricao: '',
   };
- 
+
   isEditMode = false;
   eventoId: number | null = null;
   imagemFile: File | null = null;
@@ -39,15 +38,16 @@ export class EventoForm implements OnInit, OnDestroy {
   loading = false;
   carregandoEvento = false;
   private subscriptions: Subscription = new Subscription();
- 
+
   constructor(
     private eventoService: EventoService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private toast: ToastService,
   ) {}
- 
+
   ngOnInit(): void {
-    this.route.params.subscribe(params => {
+    this.route.params.subscribe((params) => {
       if (params['id']) {
         this.isEditMode = true;
         this.eventoId = +params['id'];
@@ -55,24 +55,23 @@ export class EventoForm implements OnInit, OnDestroy {
       }
     });
   }
- 
+
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
- 
+
   carregarEvento(): void {
     if (!this.eventoId) return;
-    
+
     this.carregandoEvento = true;
     this.subscriptions.add(
       this.eventoService.buscarEventoPorId(this.eventoId).subscribe({
         next: (evento) => {
-          
-        let dataFormatada = '';
-        if (evento.dataHora) {
-          const data = new Date(evento.dataHora);
-          dataFormatada = data.toISOString().split('T')[0];
-        }
+          let dataFormatada = '';
+          if (evento.dataHora) {
+            const data = new Date(evento.dataHora);
+            dataFormatada = data.toISOString().split('T')[0];
+          }
           this.evento = {
             id: evento.id,
             nome: evento.nome,
@@ -83,51 +82,51 @@ export class EventoForm implements OnInit, OnDestroy {
             contato: evento.contato,
             requisitos: evento.requisitos,
             participantes: evento.participantes,
-            linkInscricao: evento.linkInscricao
+            linkInscricao: evento.linkInscricao,
           };
-          
+
           if (evento.imagemPrincipal) {
             this.imagemPreview = this.eventoService.getImagemUrl(evento.imagemPrincipal);
           }
-          
+
           this.carregandoEvento = false;
         },
         error: (error) => {
           console.error('Erro ao carregar evento:', error);
           this.carregandoEvento = false;
-          alert('Erro ao carregar evento para edição');
+          this.toast.erro('Erro ao carregar evento para edição');
           this.router.navigate(['/admin/eventos']);
-        }
-      })
+        },
+      }),
     );
   }
- 
+
   previewImagem(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
       this.imagemFile = input.files[0];
       const reader = new FileReader();
-      reader.onload = () => this.imagemPreview = reader.result as string;
+      reader.onload = () => (this.imagemPreview = reader.result as string);
       reader.readAsDataURL(this.imagemFile);
     }
   }
- 
+
   salvarEvento(): void {
     if (!this.validarFormulario()) {
-      alert('Preencha todos os campos obrigatórios');
+      this.toast.erro('Preencha todos os campos obrigatórios');
       return;
     }
- 
+
     this.loading = true;
- 
+
     let dataHoraFormatada = this.evento.dataHora;
- 
+
     if (dataHoraFormatada) {
       if (!dataHoraFormatada.includes('T') && !dataHoraFormatada.includes(':')) {
         dataHoraFormatada = `${dataHoraFormatada}T12:00:00`;
       }
     }
- 
+
     const eventoParaEnviar: Partial<Evento> = {
       nome: this.evento.nome,
       descricao: this.evento.descricao,
@@ -137,9 +136,9 @@ export class EventoForm implements OnInit, OnDestroy {
       contato: this.evento.contato,
       requisitos: this.evento.requisitos,
       participantes: this.evento.participantes || 0,
-      linkInscricao: this.evento.linkInscricao
+      linkInscricao: this.evento.linkInscricao,
     };
- 
+
     if (this.isEditMode && this.eventoId) {
       this.subscriptions.add(
         this.eventoService.atualizarEvento(this.eventoId, eventoParaEnviar).subscribe({
@@ -149,9 +148,9 @@ export class EventoForm implements OnInit, OnDestroy {
           error: (error) => {
             console.error('Erro ao atualizar:', error);
             this.loading = false;
-            alert('Erro ao atualizar evento. Verifique se você está logado como ADMIN.');
-          }
-        })
+            this.toast.erro('Erro ao atualizar evento. Verifique se você está logado como ADMIN.');
+          },
+        }),
       );
     } else {
       this.subscriptions.add(
@@ -162,24 +161,28 @@ export class EventoForm implements OnInit, OnDestroy {
           error: (error) => {
             console.error('Erro ao criar:', error);
             this.loading = false;
-            alert('Erro ao criar evento. Verifique se você está logado como ADMIN.');
-          }
-        })
+            this.toast.erro('Erro ao criar evento. Verifique se você está logado como ADMIN.');
+          },
+        }),
       );
     }
   }
- 
+
   processarImagem(eventoId: number): void {
     if (this.imagemFile) {
       this.eventoService.uploadImagemCloudinary(this.imagemFile).subscribe({
         next: (response) => {
           const publicId = response.public_id;
-          
+
           let dataHoraFormatada = this.evento.dataHora;
-          if (dataHoraFormatada && !dataHoraFormatada.includes('T') && !dataHoraFormatada.includes(':')) {
+          if (
+            dataHoraFormatada &&
+            !dataHoraFormatada.includes('T') &&
+            !dataHoraFormatada.includes(':')
+          ) {
             dataHoraFormatada = `${dataHoraFormatada}T12:00:00`;
           }
-          
+
           const eventoAtualizado = {
             nome: this.evento.nome,
             descricao: this.evento.descricao,
@@ -190,9 +193,9 @@ export class EventoForm implements OnInit, OnDestroy {
             requisitos: this.evento.requisitos,
             participantes: this.evento.participantes || 0,
             linkInscricao: this.evento.linkInscricao,
-            imagemPrincipal: publicId
+            imagemPrincipal: publicId,
           };
-          
+
           this.eventoService.atualizarEvento(eventoId, eventoAtualizado).subscribe({
             next: () => {
               this.loading = false;
@@ -204,16 +207,16 @@ export class EventoForm implements OnInit, OnDestroy {
               this.loading = false;
               // CORRIGIDO: navega para a lista de admin mesmo em caso de erro
               this.router.navigate(['/admin/eventos']);
-            }
+            },
           });
         },
         error: (error) => {
           console.error('Erro no upload:', error);
           this.loading = false;
-          alert('Erro ao fazer upload da imagem');
+          this.toast.erro('Erro ao fazer upload da imagem');
           // CORRIGIDO: navega para a lista de admin
           this.router.navigate(['/admin/eventos']);
-        }
+        },
       });
     } else {
       this.loading = false;
@@ -221,19 +224,21 @@ export class EventoForm implements OnInit, OnDestroy {
       this.router.navigate(['/admin/eventos']);
     }
   }
- 
+
   validarFormulario(): boolean {
-    return !!(this.evento.nome?.trim() && 
-              this.evento.descricao?.trim() && 
-              this.evento.dataHora && 
-              this.evento.local?.trim() && 
-              this.evento.contato?.trim());
+    return !!(
+      this.evento.nome?.trim() &&
+      this.evento.descricao?.trim() &&
+      this.evento.dataHora &&
+      this.evento.local?.trim() &&
+      this.evento.contato?.trim()
+    );
   }
- 
+
   cancelar(): void {
     this.router.navigate(['/admin/eventos']);
   }
- 
+
   voltar(): void {
     this.router.navigate(['/admin/eventos']);
   }

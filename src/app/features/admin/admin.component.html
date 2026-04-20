@@ -38,12 +38,12 @@
           <span>Novo Evento</span>
         </a>
       </div>
-        <div class="nav-item">
-    <a class="nav-link" routerLink="/admin/inscricoes" routerLinkActive="active">
-      <i class="bi bi-person-vcard"></i>
-      <span>Inscrições</span>
-    </a>
-  </div>
+      <div class="nav-item">
+        <a class="nav-link" routerLink="/admin/inscricoes" routerLinkActive="active">
+          <i class="bi bi-person-vcard"></i>
+          <span>Inscrições</span>
+        </a>
+      </div>
       <div class="nav-item">
         <a class="nav-link" routerLink="/admin/relatorios" routerLinkActive="active">
           <i class="bi bi-graph-up"></i>
@@ -80,6 +80,8 @@
       <router-outlet></router-outlet>
     </div>
   </main>
+
+  <app-toast></app-toast>
 
   <!-- Mobile Toggle -->
   <button class="sidebar-toggle" (click)="toggleSidebar()">

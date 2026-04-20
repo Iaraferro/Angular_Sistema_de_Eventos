@@ -2,31 +2,31 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, OnDestroy, OnInit } from '@angular/c
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-
+import { ToastComponent } from '../../shared/components/toast/toast.component';
 
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/service/auth.service';
 
 @Component({
   selector: 'app-admin',
-  imports: [MatSidenavModule, RouterModule, CommonModule ],
+  imports: [MatSidenavModule, RouterModule, CommonModule, ToastComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css',
 })
-export class Admin implements OnInit, OnDestroy{
-sidebarOpen = false;
+export class Admin implements OnInit, OnDestroy {
+  sidebarOpen = false;
   currentTitle = 'Dashboard';
   private routerSubscription: Subscription;
 
   constructor(
     public authService: AuthService,
-    private router: Router
+    private router: Router,
   ) {
-    this.routerSubscription = this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe(() => {
-      this.updateTitle();
-    });
+    this.routerSubscription = this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.updateTitle();
+      });
   }
 
   ngOnInit(): void {
@@ -42,7 +42,8 @@ sidebarOpen = false;
   updateTitle(): void {
     const path = this.router.url;
     if (path.includes('dashboard')) this.currentTitle = 'Dashboard';
-    else if (path.includes('eventos') && !path.includes('novo')) this.currentTitle = 'Gerenciar Eventos';
+    else if (path.includes('eventos') && !path.includes('novo'))
+      this.currentTitle = 'Gerenciar Eventos';
     else if (path.includes('novo-evento')) this.currentTitle = 'Novo Evento';
     else if (path.includes('participantes')) this.currentTitle = 'Participantes';
     else if (path.includes('relatorios')) this.currentTitle = 'Relatórios';

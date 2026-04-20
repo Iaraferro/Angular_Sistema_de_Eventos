@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Evento } from '../../../../shared/models/evento.model';
 import { EventoService } from '../../../../core/service/evento.service';
 import { AuthService } from '../../../../core/service/auth.service';
-
+import { ToastService } from '../../../../shared/components/toast/toast.service';
 
 @Component({
   selector: 'app-eventos-admin',
@@ -15,7 +15,7 @@ import { AuthService } from '../../../../core/service/auth.service';
   templateUrl: './eventos-admin.component.html',
   styleUrl: './eventos-admin.component.css',
 })
-export class EventosAdmin implements OnInit, OnDestroy{
+export class EventosAdmin implements OnInit, OnDestroy {
   eventos: any[] = [];
   loading = true;
   excluindo = false;
@@ -24,7 +24,8 @@ export class EventosAdmin implements OnInit, OnDestroy{
   constructor(
     private eventoService: EventoService,
     private router: Router,
-    private authService: AuthService 
+    private authService: AuthService,
+    private toast: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -43,17 +44,17 @@ export class EventosAdmin implements OnInit, OnDestroy{
         next: (eventos: Evento[]) => {
           this.eventos = eventos
             .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
-            .map(evento => ({
+            .map((evento) => ({
               ...evento,
               imagemUrl: 'assets/images/evento-placeholder.jpg',
               imagemPrincipalReal: evento.imagemPrincipal,
               dataFormatada: new Date(evento.dataHora).toLocaleDateString('pt-BR'),
-              concluido: new Date(evento.dataHora) < new Date()
+              concluido: new Date(evento.dataHora) < new Date(),
             }));
 
           this.loading = false;
 
-          this.eventos.forEach(evento => {
+          this.eventos.forEach((evento) => {
             if (evento.imagemPrincipalReal) {
               const img = new Image();
               img.onload = () => {
@@ -70,8 +71,8 @@ export class EventosAdmin implements OnInit, OnDestroy{
           console.error('Erro ao carregar eventos:', error);
           this.loading = false;
           alert('Erro ao carregar eventos.');
-        }
-      })
+        },
+      }),
     );
   }
 
@@ -96,44 +97,37 @@ export class EventosAdmin implements OnInit, OnDestroy{
     this.router.navigate(['/admin/editar-evento', evento.id]);
   }
 
-  // ✅ SIMPLES E FUNCIONAL! Sem modal complicado
   excluirEvento(id: number, nome: string): void {
     if (!this.authService.isAdmin()) {
-      alert('Apenas administradores podem excluir eventos.');
+      this.toast.aviso('Apenas administradores podem excluir eventos.');
       return;
     }
 
-    // Confirm nativo do navegador - funciona SEMPRE!
-    const confirmar = window.confirm(`Tem certeza que deseja excluir o evento "${nome}"?\n\n⚠️ Esta ação não pode ser desfeita!`);
-
-    if (!confirmar) {
-      return;
-    }
+    const confirmar = window.confirm(
+      `Tem certeza que deseja excluir "${nome}"?\n\nEsta ação não pode ser desfeita!`,
+    );
+    if (!confirmar) return;
 
     this.excluindo = true;
-
     this.subscriptions.add(
       this.eventoService.deletarEvento(id).subscribe({
         next: () => {
-          console.log('Evento excluído com sucesso!');
           this.excluindo = false;
           this.carregarEventos();
-          alert('✅ Evento excluído com sucesso!');
+          this.toast.sucesso(`Evento "${nome}" excluído com sucesso!`);
         },
         error: (error) => {
-          console.error('Erro detalhado:', error);
           this.excluindo = false;
-          
           if (error.status === 403) {
-            alert(' Você não tem permissão para excluir eventos. Apenas administradores podem fazer isso.');
+            this.toast.erro('Você não tem permissão para excluir eventos.');
           } else if (error.status === 401) {
-            alert('Sua sessão expirou. Faça login novamente.');
+            this.toast.aviso('Sua sessão expirou. Faça login novamente.');
             this.authService.logout();
           } else {
-            alert(`Erro ao excluir evento: ${error.error?.mensagem || error.message}`);
+            this.toast.erro(`Erro ao excluir evento: ${error.error?.mensagem || error.message}`);
           }
-        }
-      })
+        },
+      }),
     );
   }
 }
