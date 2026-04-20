@@ -1,9 +1,7 @@
 <!-- src/app/features/admin/pages/usuarios/usuarios.component.html -->
 <div class="usuarios-container">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-success">
-      <i class="bi bi-people me-2"></i>Gerenciar Usuários
-    </h2>
+    <h2 class="text-success"><i class="bi bi-people me-2"></i>Gerenciar Usuários</h2>
     <button class="btn btn-admin btn-admin-primary" (click)="abrirModalNovo()">
       <i class="bi bi-person-plus me-2"></i>Novo Usuário
     </button>
@@ -33,7 +31,9 @@
           <tbody>
             <tr *ngFor="let usuario of usuarios">
               <td>{{ usuario.id }}</td>
-              <td><strong>{{ usuario.nome || usuario.username }}</strong></td>
+              <td>
+                <strong>{{ usuario.nome || usuario.username }}</strong>
+              </td>
               <td>{{ usuario.username }}</td>
               <td>{{ usuario.email }}</td>
               <td>
@@ -43,10 +43,18 @@
               </td>
               <td>
                 <div class="btn-group btn-group-sm">
-                  <button class="btn btn-outline-primary" (click)="abrirModalEditar(usuario)" title="Editar">
+                  <button
+                    class="btn btn-outline-primary"
+                    (click)="abrirModalEditar(usuario)"
+                    title="Editar"
+                  >
                     <i class="bi bi-pencil"></i>
                   </button>
-                  <button class="btn btn-outline-danger" (click)="confirmarExclusao(usuario)" title="Excluir">
+                  <button
+                    class="btn btn-outline-danger"
+                    (click)="confirmarExclusao(usuario)"
+                    title="Excluir"
+                  >
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
@@ -69,7 +77,7 @@
 </div>
 
 <!-- Modal de Usuário -->
-<div id="modalUsuario" class="modal" tabindex="-1" style="display: none;">
+<div id="modalUsuario" class="modal" tabindex="-1" style="display: none">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
@@ -82,60 +90,100 @@
       <div class="modal-body">
         <div class="mb-3">
           <label class="form-label">Nome *</label>
-          <input type="text" class="form-control" [(ngModel)]="usuarioForm.nome" placeholder="Nome completo">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="usuarioForm.nome"
+            placeholder="Nome completo"
+          />
         </div>
         <div class="mb-3">
           <label class="form-label">Username *</label>
-          <input type="text" class="form-control" [(ngModel)]="usuarioForm.username" placeholder="Nome de usuário">
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="usuarioForm.username"
+            placeholder="Nome de usuário"
+          />
         </div>
         <div class="mb-3">
           <label class="form-label">Email *</label>
-          <input type="email" class="form-control" [(ngModel)]="usuarioForm.email" placeholder="email@exemplo.com">
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="usuarioForm.email"
+            placeholder="email@exemplo.com"
+          />
         </div>
         <div class="mb-3">
-          <label class="form-label">Senha {{ isEditMode ? '(deixe em branco para manter a mesma)' : '*' }}</label>
-          <input type="password" class="form-control" [(ngModel)]="usuarioForm.senha" 
-                 [placeholder]="isEditMode ? 'Nova senha (opcional)' : 'Senha'">
+          <label class="form-label"
+            >Senha {{ isEditMode ? '(deixe em branco para manter a mesma)' : '*' }}</label
+          >
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="usuarioForm.senha"
+            [placeholder]="isEditMode ? 'Nova senha (opcional)' : 'Senha'"
+          />
         </div>
         <div class="mb-3">
           <label class="form-label">Perfil *</label>
           <select class="form-select" [(ngModel)]="usuarioForm.id_perfil">
             <option [value]="2">👤 Usuário</option>
-            <option [value]="1">👑 Administrador</option>
           </select>
         </div>
-      </div>
-      <div class="modal-footer bg-light">
-        <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
-        <button type="button" class="btn btn-success" (click)="salvarUsuario()" [disabled]="salvando">
-          <span *ngIf="salvando" class="spinner-border spinner-border-sm me-2"></span>
-          {{ isEditMode ? 'Atualizar' : 'Criar' }}
-        </button>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" (click)="fecharModal()">Cancelar</button>
+          <button
+            type="button"
+            class="btn btn-success"
+            (click)="salvarUsuario()"
+            [disabled]="salvando"
+          >
+            <span *ngIf="salvando" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isEditMode ? 'Atualizar' : 'Criar' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- Modal de Exclusão -->
-<div id="modalExclusao" class="modal" tabindex="-1" style="display: none;">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão
-        </h5>
-        <button type="button" class="btn-close btn-close-white" (click)="fecharModalExclusao()"></button>
-      </div>
-      <div class="modal-body">
-        <p>Tem certeza que deseja excluir o usuário <strong>{{usuarioParaExcluir?.username}}</strong>?</p>
-        <p class="text-danger small">⚠️ Esta ação não pode ser desfeita.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="fecharModalExclusao()">Cancelar</button>
-        <button type="button" class="btn btn-danger" (click)="excluirUsuario()" [disabled]="excluindo">
-          <span *ngIf="excluindo" class="spinner-border spinner-border-sm me-2"></span>
-          Sim, excluir
-        </button>
+  <!-- Modal de Exclusão -->
+  <div id="modalExclusao" class="modal" tabindex="-1" style="display: none">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar Exclusão
+          </h5>
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            (click)="fecharModalExclusao()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Tem certeza que deseja excluir o usuário
+            <strong>{{ usuarioParaExcluir?.username }}</strong
+            >?
+          </p>
+          <p class="text-danger small">⚠️ Esta ação não pode ser desfeita.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="fecharModalExclusao()">
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="excluirUsuario()"
+            [disabled]="excluindo"
+          >
+            <span *ngIf="excluindo" class="spinner-border spinner-border-sm me-2"></span>
+            Sim, excluir
+          </button>
+        </div>
       </div>
     </div>
   </div>

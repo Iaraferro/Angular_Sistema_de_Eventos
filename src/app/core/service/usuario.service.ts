@@ -1,13 +1,14 @@
-import { Observable } from "rxjs";
-import { UsuarioCreateDTO, UsuarioResponse } from "../../shared/models/auth.model";
-import { Injectable } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { Observable } from 'rxjs';
+import { UsuarioCreateDTO, UsuarioResponse } from '../../shared/models/auth.model';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UsuarioService {
-  private apiUrl = 'http://localhost:8080/usuarios';
+  private apiUrl = `${environment.apiUrl}/usuarios`;
 
   constructor(private http: HttpClient) {}
 
