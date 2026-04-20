@@ -86,7 +86,7 @@ export class EventoService {
     }
     
     // Se já for URL completa
-    if (imagemPrincipal.startsWith('http')) {
+    if (imagemPrincipal.startsWith('http') || imagemPrincipal.startsWith('/uploads')) {
       return imagemPrincipal;
     }
     

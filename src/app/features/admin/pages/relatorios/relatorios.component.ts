@@ -109,15 +109,216 @@ export class Relatorios implements OnInit, OnDestroy{
     // O preview é atualizado automaticamente via two-way binding
   }
 
-  gerarRelatorioPersonalizado(): void {
-    if (!this.relatorioData.titulo) {
-      alert('Por favor, preencha o título do relatório.');
-      return;
+async gerarRelatorioPersonalizado(): Promise<void> {
+  if (!this.relatorioData.titulo) {
+    alert('Por favor, preencha o título do relatório.');
+    return;
+  }
+
+  // Mostra loading
+  const loading = document.createElement('div');
+  loading.innerHTML = '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:white;padding:20px;border-radius:10px;z-index:9999;">Gerando PDF com imagens...</div>';
+  document.body.appendChild(loading);
+
+  try {
+    // Cria um container invisível para renderizar o relatório com imagens
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.innerHTML = await this.montarRelatorioHTMLComImagens();
+    document.body.appendChild(container);
+
+    // Aguarda imagens carregarem
+    const imagens = container.querySelectorAll('img');
+    await Promise.all(Array.from(imagens).map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise((resolve) => { img.onload = resolve; img.onerror = resolve; });
+    }));
+
+    // Usa html2canvas para capturar com imagens
+    const canvas = await html2canvas(container, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff'
+    });
+
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf.jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
     }
 
-    const conteudo = this.montarRelatorioHTML();
-    this.imprimirRelatorio(conteudo, this.relatorioData.titulo);
+    pdf.save(`${this.relatorioData.titulo}.pdf`);
+    document.body.removeChild(container);
+    document.body.removeChild(loading);
+  } catch (error) {
+    console.error('Erro ao gerar PDF:', error);
+    alert('Erro ao gerar PDF com imagens. Gerando versão simples...');
+    this.gerarRelatorioSimples();
+    document.body.removeChild(loading);
   }
+}
+
+private gerarRelatorioSimples(): void {
+  const conteudo = this.montarRelatorioHTML();
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(conteudo);
+    win.document.close();
+    setTimeout(() => win.print(), 500);
+  }
+}
+
+private async montarRelatorioHTMLComImagens(): Promise<string> {
+  // Busca imagens dos eventos
+  const imagensPromises = this.eventos.slice(0, 5).map(async evento => {
+    let imgUrl = '';
+    if (evento.imagemPrincipal) {
+      imgUrl = this.eventoService.getImagemUrl(evento.imagemPrincipal);
+    }
+    return { id: evento.id, nome: evento.nome, imgUrl };
+  });
+  
+  const imagens = await Promise.all(imagensPromises);
+  
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>${this.relatorioData.titulo}</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+          font-family: 'Roboto', sans-serif;
+          padding: 40px;
+          background: white;
+          line-height: 1.6;
+        }
+        .header {
+          text-align: center;
+          margin-bottom: 40px;
+          padding-bottom: 20px;
+          border-bottom: 3px solid #2E8B57;
+        }
+        .header h1 { color: #2E8B57; font-size: 28px; margin-bottom: 10px; }
+        .section { margin-bottom: 30px; }
+        .section-title {
+          color: #2E8B57;
+          font-size: 20px;
+          margin-bottom: 15px;
+          padding-bottom: 8px;
+          border-bottom: 2px solid #e0e0e0;
+        }
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 20px;
+          margin-bottom: 30px;
+        }
+        .stat-card {
+          background: #f8f9fa;
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+        }
+        .stat-number {
+          font-size: 32px;
+          font-weight: bold;
+          color: #2E8B57;
+        }
+        .images-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 20px;
+          margin-top: 20px;
+        }
+        .image-card {
+          border: 1px solid #e0e0e0;
+          border-radius: 10px;
+          overflow: hidden;
+          text-align: center;
+        }
+        .image-card img {
+          width: 100%;
+          height: 150px;
+          object-fit: cover;
+        }
+        .image-card p {
+          padding: 10px;
+          font-size: 12px;
+          font-weight: bold;
+        }
+        .footer {
+          text-align: center;
+          margin-top: 50px;
+          padding-top: 20px;
+          border-top: 1px solid #e0e0e0;
+          font-size: 12px;
+          color: #6c757d;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>🌿 ${this.relatorioData.titulo}</h1>
+        <p>Data: ${new Date(this.relatorioData.dataRelatorio).toLocaleDateString('pt-BR')}</p>
+      </div>
+
+      <div class="section">
+        <h2 class="section-title">📊 Estatísticas Gerais</h2>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-number">${this.relatorioData.totalEventos}</div><div>Eventos</div></div>
+          <div class="stat-card"><div class="stat-number">${this.relatorioData.totalParticipantes}</div><div>Participantes</div></div>
+          <div class="stat-card"><div class="stat-number">${this.eventosAtivos}</div><div>Eventos Ativos</div></div>
+          <div class="stat-card"><div class="stat-number">${this.relatorioData.taxaSucesso}%</div><div>Sucesso</div></div>
+        </div>
+      </div>
+
+      ${imagens.length > 0 ? `
+      <div class="section">
+        <h2 class="section-title">📸 Imagens dos Eventos</h2>
+        <div class="images-grid">
+          ${imagens.map(img => `
+            <div class="image-card">
+              <img src="${img.imgUrl}" alt="${img.nome}" crossorigin="anonymous">
+              <p>${img.nome}</p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      ` : ''}
+
+      ${this.relatorioData.objetivo ? `<div class="section"><h2 class="section-title">🎯 Objetivo</h2><p>${this.relatorioData.objetivo}</p></div>` : ''}
+      ${this.relatorioData.atividadesRealizadas ? `<div class="section"><h2 class="section-title">📋 Atividades</h2><p>${this.relatorioData.atividadesRealizadas}</p></div>` : ''}
+      ${this.relatorioData.resultadosAlcancados ? `<div class="section"><h2 class="section-title">🏆 Resultados</h2><p>${this.relatorioData.resultadosAlcancados}</p></div>` : ''}
+
+      <div class="footer">
+        <p>Relatório gerado por EcoEventos Palmas</p>
+      </div>
+    </body>
+    </html>
+  `;
+}
 
   montarRelatorioHTML(): string {
     return `

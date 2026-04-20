@@ -1,7 +1,7 @@
-<!-- home.html - Versão com Abas -->
+<!-- home.html - Versão final com containers alinhados -->
 <section class="hero-section">
   <div class="hero-overlay"></div>
-  <div class="container">
+  <div class="container-sm">
     <h1 class="hero-title">Juntos por uma Palmas mais verde</h1>
     <p class="hero-description">
       Participe de eventos ambientais e ajude a preservar o meio ambiente da nossa cidade.
@@ -10,22 +10,26 @@
 </section>
 
 <section class="events-section" id="eventos">
-  <div class="container">
+  <div class="container-lg">
     <!-- Sistema de Abas -->
     <div class="tabs-container">
       <button 
         class="tab-btn" 
         [class.active]="activeTab === 'proximos'"
-        (click)="activeTab = 'proximos'">
+        (click)="changeTab('proximos')">
         <i class="bi bi-calendar-event"></i> Próximos Eventos
-        <span class="tab-count">{{ proximosEventos.length }}</span>
+        <span class="tab-count" [class.active-count]="activeTab === 'proximos'">
+          {{ proximosEventos.length }}
+        </span>
       </button>
       <button 
         class="tab-btn" 
         [class.active]="activeTab === 'realizados'"
-        (click)="activeTab = 'realizados'">
+        (click)="changeTab('realizados')">
         <i class="bi bi-check-circle"></i> Eventos Realizados
-        <span class="tab-count">{{ eventosConcluidos.length }}</span>
+        <span class="tab-count" [class.active-count]="activeTab === 'realizados'">
+          {{ eventosConcluidos.length }}
+        </span>
       </button>
     </div>
 
@@ -35,15 +39,18 @@
     </div>
 
     <!-- Conteúdo das Abas -->
-    <div *ngIf="!loading">
+    <div *ngIf="!loading" class="tab-content-wrapper">
       <!-- Aba Próximos Eventos -->
-      <div *ngIf="activeTab === 'proximos'">
+      <div *ngIf="activeTab === 'proximos'" class="tab-pane">
         <div class="events-grid" *ngIf="proximosEventos.length > 0">
-          <div class="event-card" *ngFor="let evento of proximosEventos" [routerLink]="['/eventos', evento.id]">
-            <!-- Card igual ao que você já tem -->
+          <div class="event-card" *ngFor="let evento of proximosEventos; let i = index" 
+               [routerLink]="['/eventos', evento.id]"
+               [style.animation-delay]="(i * 0.05) + 's'">
             <div class="event-image">
               <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
-              <span class="event-badge">Em breve</span>
+              <span class="event-badge" [class.urgent]="isProximo(evento)">
+                {{ isProximo(evento) ? '🔥 Últimas vagas' : 'Em breve' }}
+              </span>
             </div>
             <div class="event-content">
               <div class="event-date">
@@ -51,30 +58,40 @@
                 <span class="date-month">{{ formatarData(evento.dataHora).mes }}</span>
               </div>
               <h3 class="event-title">{{ evento.nome }}</h3>
-              <p class="event-location"><i class="bi bi-geo-alt"></i> {{ evento.local }}</p>
-              <p class="event-description">{{ evento.descricao | slice:0:100 }}...</p>
+              <p class="event-location">
+                <i class="bi bi-geo-alt-fill"></i> {{ evento.local }}
+              </p>
+              <p class="event-description">{{ (evento.descricao || 'Sem descrição detalhada') | slice:0:100 }}...</p>
               <div class="event-footer">
-                <span class="event-category">{{ evento.categoria || 'Evento Ambiental' }}</span>
+                <span class="event-category">
+                  <i class="bi bi-tag-fill"></i> {{ evento.categoria || 'Ambiental' }}
+                </span>
                 <span class="event-participants">
-                  <i class="bi bi-people"></i> {{ evento.participantes || 0 }}
+                  <i class="bi bi-people-fill"></i> {{ evento.participantes || 0 }}
                 </span>
               </div>
             </div>
           </div>
         </div>
+        
         <div *ngIf="proximosEventos.length === 0" class="empty-state">
-          <i class="bi bi-calendar-x"></i>
-          <p>Nenhum evento programado no momento</p>
+          <i class="bi bi-calendar-heart"></i>
+          <p>✨ Nenhum evento programado no momento</p>
+          <small>Volte em breve para conferir as novidades!</small>
         </div>
       </div>
 
       <!-- Aba Eventos Realizados -->
-      <div *ngIf="activeTab === 'realizados'">
+      <div *ngIf="activeTab === 'realizados'" class="tab-pane">
         <div class="events-grid" *ngIf="eventosConcluidos.length > 0">
-          <div class="event-card past-event" *ngFor="let evento of eventosConcluidos" [routerLink]="['/eventos', evento.id]">
+          <div class="event-card past-event" *ngFor="let evento of eventosConcluidos; let i = index" 
+               [routerLink]="['/eventos', evento.id]"
+               [style.animation-delay]="(i * 0.05) + 's'">
             <div class="event-image">
               <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
-              <span class="event-badge past">Realizado</span>
+              <span class="event-badge past">
+                <i class="bi bi-check-circle-fill"></i> Realizado
+              </span>
             </div>
             <div class="event-content">
               <div class="event-date">
@@ -82,19 +99,31 @@
                 <span class="date-month">{{ formatarData(evento.dataHora).mes }}</span>
               </div>
               <h3 class="event-title">{{ evento.nome }}</h3>
-              <p class="event-location"><i class="bi bi-geo-alt"></i> {{ evento.local }}</p>
+              <p class="event-location">
+                <i class="bi bi-geo-alt-fill"></i> {{ evento.local }}
+              </p>
+              <p class="event-description" *ngIf="evento.descricao">
+                {{ evento.descricao | slice:0:80 }}...
+              </p>
+              <p class="event-description" *ngIf="!evento.descricao">
+                Evento realizado com sucesso! Confira os detalhes.
+              </p>
               <div class="event-footer">
-                <span class="event-category">{{ evento.categoria || 'Evento Ambiental' }}</span>
+                <span class="event-category">
+                  <i class="bi bi-tag-fill"></i> {{ evento.categoria || 'Ambiental' }}
+                </span>
                 <span class="event-participants">
-                  <i class="bi bi-people"></i> {{ evento.participantes || 0 }}
+                  <i class="bi bi-people-fill"></i> {{ evento.participantes || 0 }}
                 </span>
               </div>
             </div>
           </div>
         </div>
+        
         <div *ngIf="eventosConcluidos.length === 0" class="empty-state">
-          <i class="bi bi-archive"></i>
-          <p>Nenhum evento realizado ainda</p>
+          <i class="bi bi-emoji-smile"></i>
+          <p>🎉 Nenhum evento realizado ainda</p>
+          <small>Seja o primeiro a participar dos nossos eventos!</small>
         </div>
       </div>
     </div>
@@ -102,5 +131,13 @@
 </section>
 
 <footer class="footer">
-  <!-- Footer igual ao seu -->
+  <div class="container-lg">
+    <div class="footer-brand">
+      <i class="bi bi-tree-fill"></i>
+      <span>EcoPalmas</span>
+    </div>
+    <p class="footer-copyright">
+      © 2024 EcoPalmas - Cuidando do nosso futuro juntos 🌿
+    </p>
+  </div>
 </footer>

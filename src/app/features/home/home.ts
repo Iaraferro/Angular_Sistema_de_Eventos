@@ -12,6 +12,7 @@ import { AuthService } from '../../core/service/auth.service';
   imports: [CommonModule, RouterModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
+  
 })
 export class Home implements OnInit, OnDestroy{
   proximosEventos: Evento[] = [];
@@ -19,6 +20,7 @@ export class Home implements OnInit, OnDestroy{
   loading = true;
   activeTab: 'proximos' | 'realizados' = 'proximos';
   private subscriptions: Subscription = new Subscription();
+  isChangingTab = false;
 
   constructor(
     private eventoService: EventoService,
@@ -59,6 +61,22 @@ export class Home implements OnInit, OnDestroy{
     );
   }
 
+  changeTab(tab: 'proximos' | 'realizados'): void {
+    if (this.activeTab === tab || this.isChangingTab) return;
+    
+    this.isChangingTab = true;
+    
+    // Pequeno delay para a animação de saída
+    setTimeout(() => {
+      this.activeTab = tab;
+      
+      // Delay para a animação de entrada
+      setTimeout(() => {
+        this.isChangingTab = false;
+      }, 200);
+    }, 150);
+  }
+
   getImagemUrl(imagemPrincipal: string | undefined): string {
     return this.eventoService.getImagemUrl(imagemPrincipal);
   }
@@ -68,5 +86,12 @@ export class Home implements OnInit, OnDestroy{
     const dia = data.getDate().toString().padStart(2, '0');
     const mes = data.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
     return { dia, mes };
+  }
+
+   isProximo(evento: Evento): boolean {
+    const dataEvento = new Date(evento.dataHora);
+    const agora = new Date();
+    const diffDias = Math.ceil((dataEvento.getTime() - agora.getTime()) / (1000 * 3600 * 24));
+    return diffDias <= 7 && diffDias >= 0;
   }
 }
