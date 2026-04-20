@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Arquivo } from '../../shared/models/arquivo.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -9,28 +8,41 @@ import { environment } from '../../../environments/environment';
 })
 export class ArquivoService {
   private apiUrl = `${environment.apiUrl}/eventos`;
-  private arquivosUrl = `${environment.apiUrl}/arquivos`;
+  private cloudName = environment.cloudinaryCloudName;
+  private uploadPreset = environment.cloudinaryUploadPreset;
 
   constructor(private http: HttpClient) {}
 
-  upload(idEvento: number, file: File): Observable<Arquivo> {
+  uploadCloudinary(file: File): Observable<any> {
     const formData = new FormData();
-    formData.append('arquivo', file);
-    formData.append('nomeArquivo', file.name);
-    return this.http.post<Arquivo>(`${this.apiUrl}/${idEvento}/arquivos`, formData);
+    formData.append('file', file);
+    formData.append('upload_preset', this.uploadPreset);
+    formData.append('folder', 'eventos/arquivos');
+
+    return this.http.post(
+      `https://api.cloudinary.com/v1_1/${this.cloudName}/auto/upload`,
+      formData,
+    );
   }
 
-  listarPorEvento(idEvento: number): Observable<Arquivo[]> {
-    return this.http.get<Arquivo[]>(`${this.apiUrl}/${idEvento}/arquivos`);
-  }
-
-  baixar(nomeArquivo: string): Observable<Blob> {
-    return this.http.get(`${this.arquivosUrl}/${nomeArquivo}`, {
-      responseType: 'blob',
+  salvarNoBackend(
+    idEvento: number,
+    nomeOriginal: string,
+    urlCloudinary: string,
+    mimeType: string,
+  ): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${idEvento}/arquivos`, {
+      nomeOriginal,
+      urlCloudinary,
+      mimeType,
     });
   }
 
-  deletar(nomeArquivo: string): Observable<void> {
-    return this.http.delete<void>(`${this.arquivosUrl}/${nomeArquivo}`);
+  listarPorEvento(idEvento: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${idEvento}/arquivos`);
+  }
+
+  deletar(idEvento: number, idArquivo: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${idEvento}/arquivos/${idArquivo}`);
   }
 }
