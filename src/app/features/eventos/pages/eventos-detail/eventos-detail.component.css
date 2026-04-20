@@ -2,12 +2,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #2E8B57;
+  --primary: #2e8b57;
   --primary-dark: #1d6e44;
   --primary-light: #4aa87a;
   --primary-mist: #e8f5ee;
-  --secondary: #8FBC8F;
-  --accent: #FFD700;
+  --secondary: #8fbc8f;
+  --accent: #ffd700;
   --danger: #dc3545;
   --warning: #ffc107;
   --gray-50: #fafafa;
@@ -61,7 +61,9 @@ body {
 }
 
 @keyframes spinner-border {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ============================================
@@ -194,7 +196,9 @@ body {
   object-fit: cover;
   border-radius: var(--card-radius);
   box-shadow: var(--shadow-lift);
-  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  transition:
+    transform 0.4s ease,
+    box-shadow 0.4s ease;
 }
 
 .evento-image:hover {
@@ -230,7 +234,8 @@ body {
 }
 
 @media (max-width: 992px) {
-  .col-lg-8, .col-lg-4 {
+  .col-lg-8,
+  .col-lg-4 {
     flex: 0 0 100%;
     max-width: 100%;
   }
@@ -504,8 +509,6 @@ body {
   border-top: 1px solid var(--gray-200);
 }
 
-
-
 .form-label {
   font-weight: 600;
   color: var(--gray-800);
@@ -661,13 +664,27 @@ body {
   animation: fadeInUp 0.5s ease-out both;
 }
 
-.col-lg-8 .info-card:nth-child(1) { animation-delay: 0.1s; }
-.col-lg-8 .info-card:nth-child(2) { animation-delay: 0.2s; }
-.col-lg-8 .info-card:nth-child(3) { animation-delay: 0.3s; }
-.col-lg-4 .info-card:nth-child(1) { animation-delay: 0.15s; }
-.col-lg-4 .info-card:nth-child(2) { animation-delay: 0.25s; }
-.col-lg-4 .info-card:nth-child(3) { animation-delay: 0.35s; }
-.col-lg-4 .info-card:nth-child(4) { animation-delay: 0.45s; }
+.col-lg-8 .info-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.col-lg-8 .info-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.col-lg-8 .info-card:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.col-lg-4 .info-card:nth-child(1) {
+  animation-delay: 0.15s;
+}
+.col-lg-4 .info-card:nth-child(2) {
+  animation-delay: 0.25s;
+}
+.col-lg-4 .info-card:nth-child(3) {
+  animation-delay: 0.35s;
+}
+.col-lg-4 .info-card:nth-child(4) {
+  animation-delay: 0.45s;
+}
 
 /* ============================================
    RESPONSIVIDADE
@@ -684,7 +701,8 @@ body {
     margin-bottom: 20px;
   }
 
-  .status-badge, .category-badge {
+  .status-badge,
+  .category-badge {
     padding: 5px 14px;
     font-size: 0.7rem;
   }
@@ -711,7 +729,8 @@ body {
     padding: 24px 20px;
   }
 
-  .info-card h3, .info-card h4 {
+  .info-card h3,
+  .info-card h4 {
     font-size: 1.2rem;
     margin-bottom: 18px;
   }
@@ -721,7 +740,9 @@ body {
     font-size: 1rem;
   }
 
-  .modal-header, .modal-body, .modal-footer {
+  .modal-header,
+  .modal-body,
+  .modal-footer {
     padding: 20px 24px;
   }
 
@@ -756,7 +777,8 @@ body {
     gap: 6px;
   }
 
-  .status-badge, .category-badge {
+  .status-badge,
+  .category-badge {
     padding: 4px 12px;
     font-size: 0.65rem;
   }
@@ -779,4 +801,18 @@ body {
   .info-item .text-muted {
     font-size: 0.85rem;
   }
+}
+.btn-card .btn-participar {
+  color: #ffffff !important;
+  background-color: #2e8b57 !important;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn-card p {
+  color: #6c757d !important;
 }

@@ -83,6 +83,7 @@ export class EventoForm implements OnInit, OnDestroy {
             requisitos: evento.requisitos,
             participantes: evento.participantes,
             linkInscricao: evento.linkInscricao,
+            imagemPrincipal: evento.imagemPrincipal,
           };
 
           if (evento.imagemPrincipal) {
@@ -137,6 +138,7 @@ export class EventoForm implements OnInit, OnDestroy {
       requisitos: this.evento.requisitos,
       participantes: this.evento.participantes || 0,
       linkInscricao: this.evento.linkInscricao,
+      imagemPrincipal: this.evento.imagemPrincipal,
     };
 
     if (this.isEditMode && this.eventoId) {

@@ -1,5 +1,5 @@
 <!-- src/app/features/eventos/pages/eventos-detail/eventos-detail.component.html -->
-
+<app-toast></app-toast>
 <!-- Loading State -->
 <div *ngIf="loading" class="loading-container" id="loadingEvento">
   <div class="spinner-border text-success" role="status"></div>
@@ -18,43 +18,25 @@
 
 <!-- Event Content -->
 <div *ngIf="!loading && !error && evento" id="eventoContent">
-  
   <!-- Hero Section -->
   <div class="evento-hero" [style.backgroundImage]="'url(' + imagemHeroUrl + ')'">
     <div class="container">
       <div class="row">
         <div class="col-lg-8">
-          
-          <!-- Badges Group -->
           <div class="hero-badges">
-            <!-- Status Badge -->
             <span *ngIf="isConcluido" class="status-badge past">
-              <i class="bi bi-check-circle-fill"></i>
-              Evento Realizado
+              <i class="bi bi-check-circle-fill"></i>Evento Realizado
             </span>
             <span *ngIf="!isConcluido" class="status-badge upcoming">
-              <i class="bi bi-calendar-check-fill"></i>
-              Em Breve
+              <i class="bi bi-calendar-check-fill"></i>Em Breve
             </span>
-            
-            <!-- Category Badge -->
             <span class="category-badge">
-              <i class="bi" [class.bi-brush]="evento.categoria === 'Multirão'"
-                           [class.bi-megaphone]="evento.categoria === 'Palestra'"
-                           [class.bi-tools]="evento.categoria === 'Oficina'"
-                           [class.bi-people]="evento.categoria === 'Mutirão'"
-                           [class.bi-tree-fill]="!evento.categoria"></i>
+              <i class="bi bi-tree-fill"></i>
               {{ evento.categoria || 'Evento Ambiental' }}
             </span>
           </div>
-          
-          <!-- Title -->
           <h1>{{ evento.nome }}</h1>
-          
-          <!-- Short Description -->
           <p class="lead">{{ getDescricaoCurta() }}</p>
-          
-          <!-- Participants Count -->
           <div class="participantes-count">
             <i class="bi bi-people-fill"></i>
             {{ evento.participantes || 0 }} participantes
@@ -67,46 +49,28 @@
   <!-- Main Content -->
   <div class="container">
     <div class="row">
-      
       <!-- Main Column -->
       <div class="col-lg-8">
-        
-        <!-- Event Image -->
         <div *ngIf="evento.imagemPrincipal" class="mb-4">
-          <img [src]="imagemPrincipalUrl" 
-               [alt]="evento.nome" 
-               class="evento-image">
+          <img [src]="imagemPrincipalUrl" [alt]="evento.nome" class="evento-image" />
         </div>
 
-        <!-- Description Card -->
         <div class="info-card">
-          <h3>
-            <i class="bi bi-info-circle"></i>
-            Sobre o Evento
-          </h3>
+          <h3><i class="bi bi-info-circle"></i> Sobre o Evento</h3>
           <p>{{ evento.descricao }}</p>
         </div>
 
-        <!-- Requirements Card -->
         <div class="info-card" *ngIf="evento.requisitos">
-          <h3>
-            <i class="bi bi-clipboard-check"></i>
-            O que levar e preparativos
-          </h3>
+          <h3><i class="bi bi-clipboard-check"></i> O que levar e preparativos</h3>
           <p>{{ evento.requisitos }}</p>
         </div>
       </div>
 
       <!-- Sidebar Column -->
       <div class="col-lg-4">
-        
         <!-- Event Info Card -->
         <div class="info-card">
-          <h4>
-            <i class="bi bi-calendar-event"></i>
-            Informações
-          </h4>
-          
+          <h4><i class="bi bi-calendar-event"></i> Informações</h4>
           <div class="info-item">
             <i class="bi bi-calendar-date"></i>
             <div>
@@ -114,7 +78,6 @@
               <div class="text-muted">{{ getDataFormatada(evento.dataHora) }}</div>
             </div>
           </div>
-
           <div class="info-item">
             <i class="bi bi-geo-alt"></i>
             <div>
@@ -122,7 +85,6 @@
               <div class="text-muted">{{ evento.local }}</div>
             </div>
           </div>
-
           <div class="info-item">
             <i class="bi bi-clock"></i>
             <div>
@@ -132,37 +94,21 @@
           </div>
         </div>
 
-        <!-- Category Card (if exists) -->
+        <!-- Category Card -->
         <div class="info-card" *ngIf="evento.categoria">
-          <h4>
-            <i class="bi bi-tags"></i>
-            Categoria
-          </h4>
+          <h4><i class="bi bi-tags"></i> Categoria</h4>
           <div class="info-item">
-            <i class="bi bi-tree-fill"></i>
+            <i class="bi bi-tag"></i>
             <div>
               <strong>Tipo de Evento</strong>
-              <div class="text-muted">
-                <span class="card-category-badge">
-                  <i class="bi" [class.bi-brush]="evento.categoria === 'Multirão'"
-                               [class.bi-megaphone]="evento.categoria === 'Palestra'"
-                               [class.bi-tools]="evento.categoria === 'Oficina'"
-                               [class.bi-people]="evento.categoria === 'Mutirão'"
-                               [class.bi-tag]="true"></i>
-                  {{ evento.categoria }}
-                </span>
-              </div>
+              <div class="text-muted">{{ evento.categoria }}</div>
             </div>
           </div>
         </div>
 
         <!-- Organization Card -->
         <div class="info-card">
-          <h4>
-            <i class="bi bi-building"></i>
-            Organização
-          </h4>
-          
+          <h4><i class="bi bi-building"></i> Organização</h4>
           <div class="info-item">
             <i class="bi bi-person-badge"></i>
             <div>
@@ -170,7 +116,6 @@
               <div class="text-muted">{{ evento.organizador || 'EcoEventos' }}</div>
             </div>
           </div>
-
           <div class="info-item" *ngIf="evento.contato">
             <i class="bi bi-envelope"></i>
             <div>
@@ -180,11 +125,10 @@
           </div>
         </div>
 
-        <!-- Subscribe Button Card -->
-        <div class="info-card btn-card text-center" *ngIf="!isConcluido">
+        <!-- Botão de inscrição -->
+        <div class="info-card btn-card text-center" *ngIf="!isConcluido && !mostrarFormInscricao">
           <button class="btn-participar" (click)="participarEvento()">
-            <i class="bi bi-check-circle"></i>
-            Inscrever-se
+            <i class="bi bi-check-circle"></i> Inscrever-se
           </button>
           <p class="small text-muted mt-3">
             <i class="bi bi-info-circle"></i>
@@ -192,125 +136,92 @@
           </p>
         </div>
 
-        <!-- Past Event Message -->
-        <div class="info-card text-center" *ngIf="isConcluido">
-          <div class="alert alert-secondary mb-0">
-            <i class="bi bi-clock-history me-2"></i>
-            Este evento já foi realizado
-          </div>
-        </div>
+        <!-- Formulário inline de inscrição -->
+        <div class="info-card" *ngIf="!isConcluido && mostrarFormInscricao">
+          <h4 class="mb-3"><i class="bi bi-person-plus me-2"></i>Inscrever-se</h4>
 
-        <!-- Admin Edit Button -->
-        <div class="info-card text-center" *ngIf="authService.isAdmin()">
-          <a [routerLink]="['/admin/editar-evento', evento.id]" class="btn-outline-success">
-            <i class="bi bi-pencil"></i>
-            Editar Evento
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Inscription Modal -->
-<div class="modal fade" id="modalInscricao" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content">
-      
-      <!-- Modal Header -->
-      <div class="modal-header text-white border-0">
-        <div>
-          <h4 class="modal-title fw-bold mb-1">
-            <i class="bi bi-person-plus me-2"></i>
-            Inscrever-se no Evento
-          </h4>
-          <p class="text-white-50 mb-0 small">{{ evento?.nome }}</p>
-        </div>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-
-      <!-- Modal Body -->
-      <div class="modal-body">
-        <form #inscricaoForm="ngForm">
           <div class="mb-3">
             <label class="form-label fw-semibold">
-              <i class="bi bi-person me-1 text-success"></i>
-              Nome Completo *
+              <i class="bi bi-person me-1 text-success"></i>Nome Completo *
             </label>
-            <input type="text" 
-                   class="form-control form-control-lg" 
-                   [(ngModel)]="inscricao.nome" 
-                   name="nome"
-                   placeholder="Digite seu nome completo"
-                   required>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="inscricao.nome"
+              placeholder="Digite seu nome completo"
+            />
           </div>
 
           <div class="mb-3">
             <label class="form-label fw-semibold">
-              <i class="bi bi-envelope me-1 text-success"></i>
-              E-mail *
+              <i class="bi bi-envelope me-1 text-success"></i>E-mail *
             </label>
-            <input type="email" 
-                   class="form-control form-control-lg" 
-                   [(ngModel)]="inscricao.email" 
-                   name="email"
-                   placeholder="seu@email.com"
-                   required>
+            <input
+              type="email"
+              class="form-control"
+              [(ngModel)]="inscricao.email"
+              placeholder="seu@email.com"
+            />
           </div>
 
           <div class="mb-3">
             <label class="form-label fw-semibold">
-              <i class="bi bi-telephone me-1 text-success"></i>
-              Telefone *
+              <i class="bi bi-telephone me-1 text-success"></i>Telefone *
             </label>
-            <input type="tel" 
-                   class="form-control form-control-lg" 
-                   [(ngModel)]="inscricao.telefone" 
-                   name="telefone"
-                   placeholder="(63) 99999-9999"
-                   required>
+            <input
+              type="tel"
+              class="form-control"
+              [(ngModel)]="inscricao.telefone"
+              placeholder="(63) 99999-9999"
+            />
             <div class="form-text">Ex: (63) 91234-5678</div>
           </div>
 
-          <!-- Consentimento -->
-          <div class="consentimento-wrapper">
-            <div class="d-flex align-items-start">
-              <input type="checkbox" 
-                     class="form-check-input" 
-                     id="consentimento" 
-                     [(ngModel)]="consentimento" 
-                     name="consentimento"
-                     required>
-              <div class="flex-grow-1">
-                <label for="consentimento" class="d-block">
-                  <i class="bi bi-shield-check me-1"></i>
-                  Consentimento de dados
-                </label>
-                <p>
-                  Seus dados são coletados exclusivamente para confirmação de presença e envio de informações sobre este evento.
-                  <a href="#" class="text-success" data-bs-toggle="modal" data-bs-target="#modalPolitica">Política de Privacidade</a>
-                </p>
-              </div>
+          <div class="mb-3">
+            <div class="d-flex align-items-start gap-2">
+              <input
+                type="checkbox"
+                class="form-check-input mt-1"
+                id="consentimento"
+                [(ngModel)]="consentimento"
+              />
+              <label for="consentimento" class="small text-muted">
+                <i class="bi bi-shield-check me-1"></i>
+                Autorizo o uso dos meus dados exclusivamente para confirmação de presença neste
+                evento.
+              </label>
             </div>
           </div>
-        </form>
-      </div>
 
-      <!-- Modal Footer -->
-      <div class="modal-footer border-0 justify-content-center gap-3">
-        <button type="button" 
-                class="btn btn-outline-secondary px-4 py-2" 
-                data-bs-dismiss="modal">
-          Cancelar
-        </button>
-        <button type="button" 
-                class="btn btn-success px-4 py-2" 
-                (click)="salvarInscricao()" 
-                [disabled]="salvando || inscricaoForm.invalid">
-          <span *ngIf="salvando" class="spinner-border spinner-border-sm me-2"></span>
-          <i class="bi bi-check-circle me-2" *ngIf="!salvando"></i>
-          {{ salvando ? 'Salvando...' : 'Confirmar Inscrição' }}
-        </button>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary flex-fill" (click)="cancelarInscricao()">
+              Cancelar
+            </button>
+            <button
+              class="btn btn-success flex-fill"
+              (click)="salvarInscricao()"
+              [disabled]="salvando"
+            >
+              <span *ngIf="salvando" class="spinner-border spinner-border-sm me-2"></span>
+              <i class="bi bi-check-circle me-1" *ngIf="!salvando"></i>
+              {{ salvando ? 'Salvando...' : 'Confirmar' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Evento passado -->
+        <div class="info-card text-center" *ngIf="isConcluido">
+          <div class="alert alert-secondary mb-0">
+            <i class="bi bi-clock-history me-2"></i>Este evento já foi realizado
+          </div>
+        </div>
+
+        <!-- Botão editar (admin) -->
+        <div class="info-card text-center" *ngIf="authService.isAdmin()">
+          <a [routerLink]="['/admin/editar-evento', evento.id]" class="btn btn-outline-success">
+            <i class="bi bi-pencil"></i> Editar Evento
+          </a>
+        </div>
       </div>
     </div>
   </div>
