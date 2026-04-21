@@ -21,10 +21,11 @@ export class Home implements OnInit, OnDestroy{
   loading = true;
   activeTab: 'proximos' | 'realizados' = 'proximos';
   private subscriptions: Subscription = new Subscription();
-  isChangingTab = false;
 
-
+  // Propriedades de paginação
   totalElements = 0;
+  totalProximos = 0;
+  totalRealizados = 0;
   pageSize = 6;
   currentPage = 0;
 
@@ -41,23 +42,28 @@ export class Home implements OnInit, OnDestroy{
     this.subscriptions.unsubscribe();
   }
 
-
   carregarEventos(): void {
+    this.loading = true;
+    
+    // Define o status baseado na aba ativa
+    let status = '';
+    if (this.activeTab === 'proximos') {
+      status = 'proximos';
+    } else if (this.activeTab === 'realizados') {
+      status = 'realizados';
+    }
+    
     this.subscriptions.add(
-      this.eventoService.listarEventos().subscribe({
-        next: (eventos) => {
-          const agora = new Date();
-          
-          this.proximosEventos = eventos
-            .filter(e => new Date(e.dataHora) >= agora)
-            .sort((a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime())
-            .slice(0, 6);
-
-          this.eventosConcluidos = eventos
-            .filter(e => new Date(e.dataHora) < agora)
-            .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
-            .slice(0, 6);
-
+      this.eventoService.listarPaginado(this.currentPage, this.pageSize, status).subscribe({
+        next: (response) => {
+          if (this.activeTab === 'proximos') {
+            this.proximosEventos = response.content;
+            this.totalProximos = response.totalElements;
+          } else {
+            this.eventosConcluidos = response.content;
+            this.totalRealizados = response.totalElements;
+          }
+          this.totalElements = response.totalElements;
           this.loading = false;
         },
         error: (error) => {
@@ -68,15 +74,19 @@ export class Home implements OnInit, OnDestroy{
     );
   }
 
-   changeTab(tab: 'proximos' | 'realizados'): void {
-    this.activeTab = tab;
-    this.currentPage = 0; // Volta para primeira página
-    this.carregarEventos();
-  }
-
+  // Método para mudar de página
   onPageChange(event: any): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;
+    this.carregarEventos();
+  }
+
+  // Método para mudar de aba
+  changeTab(tab: 'proximos' | 'realizados'): void {
+    if (this.activeTab === tab) return;
+    
+    this.activeTab = tab;
+    this.currentPage = 0; // Volta para primeira página
     this.carregarEventos();
   }
 
@@ -91,7 +101,7 @@ export class Home implements OnInit, OnDestroy{
     return { dia, mes };
   }
 
-   isProximo(evento: Evento): boolean {
+  isProximo(evento: Evento): boolean {
     const dataEvento = new Date(evento.dataHora);
     const agora = new Date();
     const diffDias = Math.ceil((dataEvento.getTime() - agora.getTime()) / (1000 * 3600 * 24));

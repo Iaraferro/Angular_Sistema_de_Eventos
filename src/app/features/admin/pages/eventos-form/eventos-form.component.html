@@ -145,18 +145,11 @@
                     placeholder="Ex: Levar água, roupas confortáveis..."></textarea>
                 </div>
                 
-                <div class="row">
-                  <div class="col-6 mb-3">
+                <div class="row" class="vagas">
+                  <div class="col-6 mb-3" >
                     <label for="participantes" class="form-label">Vagas</label>
                     <input type="number" class="form-control" id="participantes"
                       [(ngModel)]="evento.participantes" name="participantes" min="0">
-                  </div>
-                  <div class="col-6 mb-3">
-                    <label for="linkInscricao" class="form-label">Link de Inscrição</label>
-                    <input type="url" class="form-control" id="linkInscricao"
-                      [(ngModel)]="evento.linkInscricao" name="linkInscricao"
-                      placeholder="https://forms.gle/...">
-                    <div class="form-text">Link externo para inscrição</div>
                   </div>
                 </div>
               </div>
