@@ -4,14 +4,15 @@ import { Evento } from "../../../../shared/models/evento.model";
 import { Subscription } from "rxjs";
 import { InscricaoService } from "../../../../core/service/inscricao.service";
 import { EventoService } from "../../../../core/service/evento.service";
-import { CommonModule } from "@angular/common";
+
 import { FormsModule } from "@angular/forms";
 import { forkJoin } from 'rxjs';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-inscricoes-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, MatPaginatorModule],
   templateUrl: './inscricoes-admin.component.html',
   styleUrls: ['./inscricoes-admin.component.css']
 })
@@ -22,6 +23,11 @@ export class InscricaoAdmin implements OnInit, OnDestroy{
   loading = true;
   eventoFiltroId: number | null = null;
   searchTerm: string = '';
+
+  totalElements = 0;
+  pageSize = 10;
+  currentPage = 0;
+
   private subscriptions: Subscription = new Subscription();
 
   constructor(
@@ -55,26 +61,32 @@ export class InscricaoAdmin implements OnInit, OnDestroy{
     );
   }
 
-  // ✅ CORRIGIDO: Use listarTodasComEventos se disponível, senão carrega otimizado
+  //  Use listarTodasComEventos se disponível, senão carrega otimizado
   carregarInscricoes(): void {
-    // Tenta carregar todas de uma vez (se backend suportar)
+    this.loading = true;
     this.subscriptions.add(
-      this.inscricaoService.listarTodas().subscribe({
-        next: (inscricoes) => {
-          // Enriquecer com nome do evento
-          this.inscricoes = inscricoes.map(inscricao => ({
-            ...inscricao,
-            eventoNome: this.eventos.find(e => e.id === inscricao.eventoId)?.nome || 'Evento não encontrado'
-          }));
-          this.filtrarInscricoes();
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Erro ao carregar inscrições:', error);
-          this.loading = false;
-        }
-      })
-    );
+    this.inscricaoService.listarTodas().subscribe({
+      next: (inscricoes) => {  
+        this.inscricoes = inscricoes.map(inscricao => ({
+          ...inscricao,
+          eventoNome: this.eventos.find(e => e.id === inscricao.eventoId)?.nome || 'Evento não encontrado'
+        }));
+        
+        this.filtrarInscricoes();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar inscrições:', error);
+        this.loading = false;
+      }
+    })
+  );
+  }
+
+   onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.carregarInscricoes();
   }
 
   filtrarInscricoes(): void {

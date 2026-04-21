@@ -1,7 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 
 import { Observable } from 'rxjs';
-import { HttpClient,  } from '@angular/common/http';
+import { HttpClient, HttpParams,  } from '@angular/common/http';
 import { Evento } from '../../shared/models/evento.model';
 import { Cloudinary } from '@cloudinary/url-gen/index';
 import { format, quality } from '@cloudinary/url-gen/actions/delivery';
@@ -15,13 +15,14 @@ export interface PaginatedResponse<T> {
   totalPages: number;
   size: number;
   number: number;
+  page: number;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class EventoService {
-   private apiUrl = `${environment.apiUrl}/eventos`;
+  private apiUrl = `${environment.apiUrl}/eventos`;
   private cloudinary: Cloudinary;
   private cloudName = environment.cloudinaryCloudName;
   private uploadPreset = environment.cloudinaryUploadPreset;
@@ -33,7 +34,19 @@ export class EventoService {
       }
     });
   }
+  listarPaginado(page: number = 0, size: number = 6, status?: string): Observable<PaginatedResponse<Evento>> {
+  let params = new HttpParams()
+    .set('page', page.toString())
+    .set('size', size.toString());
+  
+  if (status) {
+    params = params.set('status', status);
+  }
+  
+  return this.http.get<PaginatedResponse<Evento>>(`${this.apiUrl}/paginado`, { params });
+}
 
+  
   listarEventos(): Observable<Evento[]> {
     return this.http.get<Evento[]>(this.apiUrl);
   }
@@ -115,5 +128,6 @@ export class EventoService {
     
     return image.toURL();
   }
+  
 
 }

@@ -9,15 +9,17 @@
       </a>
     </div>
 
-    <div class="sidebar-user" *ngIf="authService.getCurrentUser()">
-      <div class="user-avatar">
-        <i class="bi bi-person-fill"></i>
+    @if (authService.getCurrentUser()) {
+      <div class="sidebar-user">
+        <div class="user-avatar">
+          <i class="bi bi-person-fill"></i>
+        </div>
+        <div class="user-info">
+          <div class="user-name">{{ authService.getCurrentUser()?.username }}</div>
+          <div class="user-role">{{ authService.getCurrentUser()?.perfil?.nome }}</div>
+        </div>
       </div>
-      <div class="user-info">
-        <div class="user-name">{{ authService.getCurrentUser()?.username }}</div>
-        <div class="user-role">{{ authService.getCurrentUser()?.perfil?.nome }}</div>
-      </div>
-    </div>
+    }
 
     <nav class="sidebar-nav">
       <div class="nav-item">
@@ -50,12 +52,7 @@
           <span>Relatórios</span>
         </a>
       </div>
-      <div class="nav-item">
-        <a class="nav-link" routerLink="/admin/usuarios" routerLinkActive="active">
-          <i class="bi bi-person-badge"></i>
-          <span>Usuários</span>
-        </a>
-      </div>
+     
     </nav>
 
     <div class="sidebar-footer">

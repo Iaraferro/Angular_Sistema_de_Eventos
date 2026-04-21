@@ -163,6 +163,10 @@
   border-color: #dc3545;
 }
 
+.paginador{
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
 /* Responsive */
 @media (max-width: 768px) {
   .inscricoes-container {

@@ -2,12 +2,12 @@ import { Component, OnInit } from '@angular/core';
 
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../../../core/service/auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -24,7 +24,7 @@ export class Login implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // ✅ Se já estiver logado, redireciona
+    
     if (this.authService.isLoggedIn()) {
       this.router.navigate(['/admin/dashboard']);
     }

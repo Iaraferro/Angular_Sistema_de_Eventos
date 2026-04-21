@@ -6,10 +6,11 @@ import { Subscription } from 'rxjs';
 
 import { EventoService } from '../../core/service/evento.service';
 import { AuthService } from '../../core/service/auth.service';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatPaginatorModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
   
@@ -21,6 +22,11 @@ export class Home implements OnInit, OnDestroy{
   activeTab: 'proximos' | 'realizados' = 'proximos';
   private subscriptions: Subscription = new Subscription();
   isChangingTab = false;
+
+
+  totalElements = 0;
+  pageSize = 6;
+  currentPage = 0;
 
   constructor(
     private eventoService: EventoService,
@@ -34,6 +40,7 @@ export class Home implements OnInit, OnDestroy{
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
+
 
   carregarEventos(): void {
     this.subscriptions.add(
@@ -61,20 +68,16 @@ export class Home implements OnInit, OnDestroy{
     );
   }
 
-  changeTab(tab: 'proximos' | 'realizados'): void {
-    if (this.activeTab === tab || this.isChangingTab) return;
-    
-    this.isChangingTab = true;
-    
-    // Pequeno delay para a animação de saída
-    setTimeout(() => {
-      this.activeTab = tab;
-      
-      // Delay para a animação de entrada
-      setTimeout(() => {
-        this.isChangingTab = false;
-      }, 200);
-    }, 150);
+   changeTab(tab: 'proximos' | 'realizados'): void {
+    this.activeTab = tab;
+    this.currentPage = 0; // Volta para primeira página
+    this.carregarEventos();
+  }
+
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.carregarEventos();
   }
 
   getImagemUrl(imagemPrincipal: string | undefined): string {
@@ -94,4 +97,5 @@ export class Home implements OnInit, OnDestroy{
     const diffDias = Math.ceil((dataEvento.getTime() - agora.getTime()) / (1000 * 3600 * 24));
     return diffDias <= 7 && diffDias >= 0;
   }
+
 }

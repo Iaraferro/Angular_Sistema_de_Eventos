@@ -4,12 +4,12 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../core/service/auth.service';
 
 @Component({
   selector: 'app-admin',
-  imports: [MatSidenavModule, RouterModule, CommonModule, ToastComponent],
+  imports: [MatSidenavModule, RouterModule, ToastComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css',
 })

@@ -3,7 +3,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { Evento } from '../../../../shared/models/evento.model';
-import { CommonModule } from '@angular/common';
+
 import { EventoService } from '../../../../core/service/evento.service';
 import { AuthService } from '../../../../core/service/auth.service';
 import { InscricaoService } from '../../../../core/service/inscricao.service';
@@ -13,7 +13,7 @@ import { ToastComponent } from '../../../../shared/components/toast/toast.compon
 
 @Component({
   selector: 'app-eventos',
-  imports: [MatIconModule, CommonModule, RouterModule, FormsModule, ToastComponent],
+  imports: [MatIconModule, RouterModule, FormsModule, ToastComponent],
   templateUrl: './eventos-detail.component.html',
   styleUrl: './eventos-detail.component.css',
 })

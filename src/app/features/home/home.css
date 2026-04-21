@@ -382,7 +382,7 @@ body {
   margin-bottom: 18px;
   flex: 1;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -464,6 +464,11 @@ body {
   color: var(--gray);
   font-size: 0.85rem;
   display: block;
+}
+.estilo_paginacao{
+  background-color: #f4f6f4;
+  margin-right: 520px;
+  margin-left: 490px;
 }
 
 /* ============================================

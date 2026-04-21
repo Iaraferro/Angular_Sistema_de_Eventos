@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ToastService, Toast } from './toast.service';
 import { Subscription } from 'rxjs';
@@ -6,28 +6,29 @@ import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-toast',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   template: `
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
-      <div
-        *ngFor="let toast of toasts"
-        class="toast show align-items-center border-0"
-        [class]="'text-white bg-' + toast.type"
-      >
-        <div class="d-flex">
-          <div class="toast-body d-flex align-items-center gap-2">
-            <i [class]="getIcon(toast.type)"></i>
-            {{ toast.message }}
+      @for (toast of toasts; track toast) {
+        <div
+          class="toast show align-items-center border-0"
+          [class]="'text-white bg-' + toast.type"
+          >
+          <div class="d-flex">
+            <div class="toast-body d-flex align-items-center gap-2">
+              <i [class]="getIcon(toast.type)"></i>
+              {{ toast.message }}
+            </div>
+            <button
+              type="button"
+              class="btn-close btn-close-white me-2 m-auto"
+              (click)="remover(toast)"
+            ></button>
           </div>
-          <button
-            type="button"
-            class="btn-close btn-close-white me-2 m-auto"
-            (click)="remover(toast)"
-          ></button>
         </div>
-      </div>
+      }
     </div>
-  `,
+    `,
 })
 export class ToastComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];

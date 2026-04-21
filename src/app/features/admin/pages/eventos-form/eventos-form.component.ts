@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,10 +11,11 @@ import { EventoService } from '../../../../core/service/evento.service';
 import { Subscription } from 'rxjs';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 
+
 @Component({
   selector: 'app-novo-evento',
   standalone: true,
-  imports: [MatIconModule, CommonModule, FormsModule, HttpClientModule],
+  imports: [MatIconModule, FormsModule, HttpClientModule],
   templateUrl: './eventos-form.component.html',
   styleUrl: './eventos-form.component.css',
 })

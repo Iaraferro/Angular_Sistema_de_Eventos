@@ -1,246 +1,261 @@
 <!-- src/app/features/eventos/pages/eventos-detail/eventos-detail.component.html -->
 <app-toast></app-toast>
 <!-- Loading State -->
-<div *ngIf="loading" class="loading-container" id="loadingEvento">
-  <div class="spinner-border text-success" role="status"></div>
-  <p class="mt-3 text-muted">Carregando detalhes do evento...</p>
-</div>
+@if (loading) {
+  <div class="loading-container" id="loadingEvento">
+    <div class="spinner-border text-success" role="status"></div>
+    <p class="mt-3 text-muted">Carregando detalhes do evento...</p>
+  </div>
+}
 
 <!-- Error State -->
-<div *ngIf="error" class="error-container" id="errorEvento">
-  <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
-  <h3 class="mt-3">Evento não encontrado</h3>
-  <p class="text-muted mb-4">O evento que você está procurando não existe ou foi removido.</p>
-  <a routerLink="/" class="btn btn-outline-success">
-    <i class="bi bi-arrow-left me-2"></i>Voltar para Eventos
-  </a>
-</div>
+@if (error) {
+  <div class="error-container" id="errorEvento">
+    <i class="bi bi-exclamation-triangle display-1 text-danger"></i>
+    <h3 class="mt-3">Evento não encontrado</h3>
+    <p class="text-muted mb-4">O evento que você está procurando não existe ou foi removido.</p>
+    <a routerLink="/" class="btn btn-outline-success">
+      <i class="bi bi-arrow-left me-2"></i>Voltar para Eventos
+    </a>
+  </div>
+}
 
 <!-- Event Content -->
-<div *ngIf="!loading && !error && evento" id="eventoContent">
-  <!-- Hero Section -->
-  <div class="evento-hero" [style.backgroundImage]="'url(' + imagemHeroUrl + ')'">
+@if (!loading && !error && evento) {
+  <div id="eventoContent">
+    <!-- Hero Section -->
+    <div class="evento-hero" [style.backgroundImage]="'url(' + imagemHeroUrl + ')'">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-8">
+            <div class="hero-badges">
+              @if (isConcluido) {
+                <span class="status-badge past">
+                  <i class="bi bi-check-circle-fill"></i>Evento Realizado
+                </span>
+              }
+              @if (!isConcluido) {
+                <span class="status-badge upcoming">
+                  <i class="bi bi-calendar-check-fill"></i>Em Breve
+                </span>
+              }
+              <span class="category-badge">
+                <i class="bi bi-tree-fill"></i>
+                {{ evento.categoria || 'Evento Ambiental' }}
+              </span>
+            </div>
+            <h1>{{ evento.nome }}</h1>
+            <p class="lead">{{ getDescricaoCurta() }}</p>
+            <div class="participantes-count">
+              <i class="bi bi-people-fill"></i>
+              {{ evento.participantes || 0 }} participantes
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Main Content -->
     <div class="container">
       <div class="row">
+        <!-- Main Column -->
         <div class="col-lg-8">
-          <div class="hero-badges">
-            <span *ngIf="isConcluido" class="status-badge past">
-              <i class="bi bi-check-circle-fill"></i>Evento Realizado
-            </span>
-            <span *ngIf="!isConcluido" class="status-badge upcoming">
-              <i class="bi bi-calendar-check-fill"></i>Em Breve
-            </span>
-            <span class="category-badge">
-              <i class="bi bi-tree-fill"></i>
-              {{ evento.categoria || 'Evento Ambiental' }}
-            </span>
+          @if (evento.imagemPrincipal) {
+            <div class="mb-4">
+              <img [src]="imagemPrincipalUrl" [alt]="evento.nome" class="evento-image" />
+            </div>
+          }
+          <div class="info-card">
+            <h3><i class="bi bi-info-circle"></i> Sobre o Evento</h3>
+            <p>{{ evento.descricao }}</p>
           </div>
-          <h1>{{ evento.nome }}</h1>
-          <p class="lead">{{ getDescricaoCurta() }}</p>
-          <div class="participantes-count">
-            <i class="bi bi-people-fill"></i>
-            {{ evento.participantes || 0 }} participantes
-          </div>
+          @if (evento.requisitos) {
+            <div class="info-card">
+              <h3><i class="bi bi-clipboard-check"></i> O que levar e preparativos</h3>
+              <p>{{ evento.requisitos }}</p>
+            </div>
+          }
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="container">
-    <div class="row">
-      <!-- Main Column -->
-      <div class="col-lg-8">
-        <div *ngIf="evento.imagemPrincipal" class="mb-4">
-          <img [src]="imagemPrincipalUrl" [alt]="evento.nome" class="evento-image" />
-        </div>
-
-        <div class="info-card">
-          <h3><i class="bi bi-info-circle"></i> Sobre o Evento</h3>
-          <p>{{ evento.descricao }}</p>
-        </div>
-
-        <div class="info-card" *ngIf="evento.requisitos">
-          <h3><i class="bi bi-clipboard-check"></i> O que levar e preparativos</h3>
-          <p>{{ evento.requisitos }}</p>
-        </div>
-      </div>
-
-      <!-- Sidebar Column -->
-      <div class="col-lg-4">
-        <!-- Event Info Card -->
-        <div class="info-card">
-          <h4><i class="bi bi-calendar-event"></i> Informações</h4>
-          <div class="info-item">
-            <i class="bi bi-calendar-date"></i>
-            <div>
-              <strong>Data do Evento</strong>
-              <div class="text-muted">{{ getDataFormatada(evento.dataHora) }}</div>
+        <!-- Sidebar Column -->
+        <div class="col-lg-4">
+          <!-- Event Info Card -->
+          <div class="info-card">
+            <h4><i class="bi bi-calendar-event"></i> Informações</h4>
+            <div class="info-item">
+              <i class="bi bi-calendar-date"></i>
+              <div>
+                <strong>Data do Evento</strong>
+                <div class="text-muted">{{ getDataFormatada(evento.dataHora) }}</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-geo-alt"></i>
+              <div>
+                <strong>Local</strong>
+                <div class="text-muted">{{ evento.local }}</div>
+              </div>
+            </div>
+            <div class="info-item">
+              <i class="bi bi-clock"></i>
+              <div>
+                <strong>Horário</strong>
+                <div class="text-muted">{{ getHorarioFormatado(evento.dataHora) }}h</div>
+              </div>
             </div>
           </div>
-          <div class="info-item">
-            <i class="bi bi-geo-alt"></i>
-            <div>
-              <strong>Local</strong>
-              <div class="text-muted">{{ evento.local }}</div>
+          <!-- Category Card -->
+          @if (evento.categoria) {
+            <div class="info-card">
+              <h4><i class="bi bi-tags"></i> Categoria</h4>
+              <div class="info-item">
+                <i class="bi bi-tag"></i>
+                <div>
+                  <strong>Tipo de Evento</strong>
+                  <div class="text-muted">{{ evento.categoria }}</div>
+                </div>
+              </div>
+            </div>
+          }
+          <!-- Organization Card -->
+          <div class="info-card">
+            <h4><i class="bi bi-building"></i> Organização</h4>
+            <div class="info-item">
+              <i class="bi bi-person-badge"></i>
+              <div>
+                <strong>Organizador</strong>
+                <div class="text-muted">{{ evento.organizador || 'EcoEventos' }}</div>
+              </div>
+            </div>
+            @if (evento.contato) {
+              <div class="info-item">
+                <i class="bi bi-envelope"></i>
+                <div>
+                  <strong>Contato</strong>
+                  <div class="text-muted">{{ evento.contato }}</div>
+                </div>
+              </div>
+            }
+          </div>
+          <!-- Botão de inscrição -->
+          @if (!isConcluido && !mostrarFormInscricao) {
+            <div class="info-card btn-card text-center">
+              <button class="btn-participar" (click)="participarEvento()">
+                <i class="bi bi-check-circle"></i> Inscrever-se
+              </button>
+              <p class="small text-muted mt-3">
+                <i class="bi bi-info-circle"></i>
+                Preencha seus dados para participar
+              </p>
+            </div>
+          }
+          <!-- Formulário inline de inscrição -->
+          @if (!isConcluido && mostrarFormInscricao) {
+            <div class="info-card">
+              <h4 class="mb-3"><i class="bi bi-person-plus me-2"></i>Inscrever-se</h4>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person me-1 text-success"></i>Nome Completo *
+                </label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="inscricao.nome"
+                  placeholder="Digite seu nome completo"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">
+                    <i class="bi bi-envelope me-1 text-success"></i>E-mail *
+                  </label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    [(ngModel)]="inscricao.email"
+                    placeholder="seu@email.com"
+                    />
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                      <i class="bi bi-telephone me-1 text-success"></i>Telefone *
+                    </label>
+                    <input
+                      type="tel"
+                      class="form-control"
+                      [(ngModel)]="inscricao.telefone"
+                      placeholder="(63) 99999-9999"
+                      />
+                      <div class="form-text">Ex: (63) 91234-5678</div>
+                    </div>
+                    <div class="mb-3">
+                      <div class="d-flex align-items-start gap-2">
+                        <input
+                          type="checkbox"
+                          class="form-check-input mt-1"
+                          id="consentimento"
+                          [(ngModel)]="consentimento"
+                          />
+                          <label for="consentimento" class="small text-muted">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Autorizo o uso dos meus dados exclusivamente para confirmação de presença neste
+                            evento.
+                          </label>
+                        </div>
+                      </div>
+                      <div class="d-flex gap-2">
+                        <button class="btn btn-outline-secondary flex-fill" (click)="cancelarInscricao()">
+                          Cancelar
+                        </button>
+                        <button
+                          class="btn btn-success flex-fill"
+                          (click)="salvarInscricao()"
+                          [disabled]="salvando"
+                          >
+                          @if (salvando) {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                          }
+                          @if (!salvando) {
+                            <i class="bi bi-check-circle me-1"></i>
+                          }
+                          {{ salvando ? 'Salvando...' : 'Confirmar' }}
+                        </button>
+                      </div>
+                    </div>
+                  }
+                  <!-- Evento passado -->
+                  @if (isConcluido) {
+                    <div class="info-card text-center">
+                      <div class="alert alert-secondary mb-0">
+                        <i class="bi bi-clock-history me-2"></i>Este evento já foi realizado
+                      </div>
+                    </div>
+                  }
+                  <!-- Botão editar (admin) -->
+                  @if (authService.isAdmin()) {
+                    <div class="info-card text-center">
+                      <a [routerLink]="['/admin/editar-evento', evento.id]" class="btn btn-outline-success">
+                        <i class="bi bi-pencil"></i> Editar Evento
+                      </a>
+                    </div>
+                  }
+                </div>
+              </div>
             </div>
           </div>
-          <div class="info-item">
-            <i class="bi bi-clock"></i>
-            <div>
-              <strong>Horário</strong>
-              <div class="text-muted">{{ getHorarioFormatado(evento.dataHora) }}h</div>
+        }
+
+        <!-- Footer -->
+        <footer class="footer">
+          <div class="container">
+            <div class="footer-content">
+              <div class="footer-brand">
+                <i class="bi bi-tree-fill"></i>
+                <span>EcoEventos Palmas</span>
+              </div>
+              <p class="footer-copyright">&copy; 2025 EcoEventos Palmas - Todos os direitos reservados</p>
             </div>
           </div>
-        </div>
+        </footer>
 
-        <!-- Category Card -->
-        <div class="info-card" *ngIf="evento.categoria">
-          <h4><i class="bi bi-tags"></i> Categoria</h4>
-          <div class="info-item">
-            <i class="bi bi-tag"></i>
-            <div>
-              <strong>Tipo de Evento</strong>
-              <div class="text-muted">{{ evento.categoria }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Organization Card -->
-        <div class="info-card">
-          <h4><i class="bi bi-building"></i> Organização</h4>
-          <div class="info-item">
-            <i class="bi bi-person-badge"></i>
-            <div>
-              <strong>Organizador</strong>
-              <div class="text-muted">{{ evento.organizador || 'EcoEventos' }}</div>
-            </div>
-          </div>
-          <div class="info-item" *ngIf="evento.contato">
-            <i class="bi bi-envelope"></i>
-            <div>
-              <strong>Contato</strong>
-              <div class="text-muted">{{ evento.contato }}</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Botão de inscrição -->
-        <div class="info-card btn-card text-center" *ngIf="!isConcluido && !mostrarFormInscricao">
-          <button class="btn-participar" (click)="participarEvento()">
-            <i class="bi bi-check-circle"></i> Inscrever-se
-          </button>
-          <p class="small text-muted mt-3">
-            <i class="bi bi-info-circle"></i>
-            Preencha seus dados para participar
-          </p>
-        </div>
-
-        <!-- Formulário inline de inscrição -->
-        <div class="info-card" *ngIf="!isConcluido && mostrarFormInscricao">
-          <h4 class="mb-3"><i class="bi bi-person-plus me-2"></i>Inscrever-se</h4>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-person me-1 text-success"></i>Nome Completo *
-            </label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="inscricao.nome"
-              placeholder="Digite seu nome completo"
-            />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-envelope me-1 text-success"></i>E-mail *
-            </label>
-            <input
-              type="email"
-              class="form-control"
-              [(ngModel)]="inscricao.email"
-              placeholder="seu@email.com"
-            />
-          </div>
-
-          <div class="mb-3">
-            <label class="form-label fw-semibold">
-              <i class="bi bi-telephone me-1 text-success"></i>Telefone *
-            </label>
-            <input
-              type="tel"
-              class="form-control"
-              [(ngModel)]="inscricao.telefone"
-              placeholder="(63) 99999-9999"
-            />
-            <div class="form-text">Ex: (63) 91234-5678</div>
-          </div>
-
-          <div class="mb-3">
-            <div class="d-flex align-items-start gap-2">
-              <input
-                type="checkbox"
-                class="form-check-input mt-1"
-                id="consentimento"
-                [(ngModel)]="consentimento"
-              />
-              <label for="consentimento" class="small text-muted">
-                <i class="bi bi-shield-check me-1"></i>
-                Autorizo o uso dos meus dados exclusivamente para confirmação de presença neste
-                evento.
-              </label>
-            </div>
-          </div>
-
-          <div class="d-flex gap-2">
-            <button class="btn btn-outline-secondary flex-fill" (click)="cancelarInscricao()">
-              Cancelar
-            </button>
-            <button
-              class="btn btn-success flex-fill"
-              (click)="salvarInscricao()"
-              [disabled]="salvando"
-            >
-              <span *ngIf="salvando" class="spinner-border spinner-border-sm me-2"></span>
-              <i class="bi bi-check-circle me-1" *ngIf="!salvando"></i>
-              {{ salvando ? 'Salvando...' : 'Confirmar' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Evento passado -->
-        <div class="info-card text-center" *ngIf="isConcluido">
-          <div class="alert alert-secondary mb-0">
-            <i class="bi bi-clock-history me-2"></i>Este evento já foi realizado
-          </div>
-        </div>
-
-        <!-- Botão editar (admin) -->
-        <div class="info-card text-center" *ngIf="authService.isAdmin()">
-          <a [routerLink]="['/admin/editar-evento', evento.id]" class="btn btn-outline-success">
-            <i class="bi bi-pencil"></i> Editar Evento
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Footer -->
-<footer class="footer">
-  <div class="container">
-    <div class="footer-content">
-      <div class="footer-brand">
-        <i class="bi bi-tree-fill"></i>
-        <span>EcoEventos Palmas</span>
-      </div>
-      <p class="footer-copyright">&copy; 2025 EcoEventos Palmas - Todos os direitos reservados</p>
-    </div>
-  </div>
-</footer>
-
-<!-- Back to Top Button -->
-<a href="#" class="back-to-top" (click)="voltarAoTopo($event)">
-  <i class="bi bi-arrow-up"></i>
-</a>
+        <!-- Back to Top Button -->
+        <a href="#" class="back-to-top" (click)="voltarAoTopo($event)">
+          <i class="bi bi-arrow-up"></i>
+        </a>

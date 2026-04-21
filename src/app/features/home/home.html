@@ -13,8 +13,8 @@
   <div class="container-lg">
     <!-- Sistema de Abas -->
     <div class="tabs-container">
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="activeTab === 'proximos'"
         (click)="changeTab('proximos')">
         <i class="bi bi-calendar-event"></i> Próximos Eventos
@@ -22,8 +22,8 @@
           {{ proximosEventos.length }}
         </span>
       </button>
-      <button 
-        class="tab-btn" 
+      <button
+        class="tab-btn"
         [class.active]="activeTab === 'realizados'"
         (click)="changeTab('realizados')">
         <i class="bi bi-check-circle"></i> Eventos Realizados
@@ -34,101 +34,133 @@
     </div>
 
     <!-- Loading -->
-    <div *ngIf="loading" class="skeletons-container">
-      <div class="skeleton-card" *ngFor="let i of [1,2,3,4,5,6]"></div>
-    </div>
+    @if (loading) {
+      <div class="skeletons-container">
+        @for (i of [1,2,3,4,5,6]; track i) {
+          <div class="skeleton-card"></div>
+        }
+      </div>
+    }
 
     <!-- Conteúdo das Abas -->
-    <div *ngIf="!loading" class="tab-content-wrapper">
-      <!-- Aba Próximos Eventos -->
-      <div *ngIf="activeTab === 'proximos'" class="tab-pane">
-        <div class="events-grid" *ngIf="proximosEventos.length > 0">
-          <div class="event-card" *ngFor="let evento of proximosEventos; let i = index" 
-               [routerLink]="['/eventos', evento.id]"
-               [style.animation-delay]="(i * 0.05) + 's'">
-            <div class="event-image">
-              <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
-              <span class="event-badge" [class.urgent]="isProximo(evento)">
-                {{ isProximo(evento) ? '🔥 Últimas vagas' : 'Em breve' }}
-              </span>
-            </div>
-            <div class="event-content">
-              <div class="event-date">
-                <span class="date-day">{{ formatarData(evento.dataHora).dia }}</span>
-                <span class="date-month">{{ formatarData(evento.dataHora).mes }}</span>
+    @if (!loading) {
+      <div class="tab-content-wrapper">
+        <!-- Aba Próximos Eventos -->
+        @if (activeTab === 'proximos') {
+          <div class="tab-pane">
+            @if (proximosEventos.length > 0) {
+              <div class="events-grid">
+                @for (evento of proximosEventos; track evento; let i = $index) {
+                  <div class="event-card"
+                    [routerLink]="['/eventos', evento.id]"
+                    [style.animation-delay]="(i * 0.05) + 's'">
+                    <div class="event-image">
+                      <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
+                      <span class="event-badge" [class.urgent]="isProximo(evento)">
+                        {{ isProximo(evento) ? '🔥 Últimas vagas' : 'Em breve' }}
+                      </span>
+                    </div>
+                    <div class="event-content">
+                      <div class="event-date">
+                        <span class="date-day">{{ formatarData(evento.dataHora).dia }}</span>
+                        <span class="date-month">{{ formatarData(evento.dataHora).mes }}</span>
+                      </div>
+                      <h3 class="event-title">{{ evento.nome }}</h3>
+                      <p class="event-location">
+                        <i class="bi bi-geo-alt-fill"></i> {{ evento.local }}
+                      </p>
+                      <p class="event-description">{{ (evento.descricao || 'Sem descrição detalhada') | slice:0:100 }}...</p>
+                      <div class="event-footer">
+                        <span class="event-category">
+                          <i class="bi bi-tag-fill"></i> {{ evento.categoria || 'Ambiental' }}
+                        </span>
+                        <span class="event-participants">
+                          <i class="bi bi-people-fill"></i> {{ evento.participantes || 0 }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
               </div>
-              <h3 class="event-title">{{ evento.nome }}</h3>
-              <p class="event-location">
-                <i class="bi bi-geo-alt-fill"></i> {{ evento.local }}
-              </p>
-              <p class="event-description">{{ (evento.descricao || 'Sem descrição detalhada') | slice:0:100 }}...</p>
-              <div class="event-footer">
-                <span class="event-category">
-                  <i class="bi bi-tag-fill"></i> {{ evento.categoria || 'Ambiental' }}
-                </span>
-                <span class="event-participants">
-                  <i class="bi bi-people-fill"></i> {{ evento.participantes || 0 }}
-                </span>
+            }
+            @if (proximosEventos.length === 0) {
+              <div class="empty-state">
+                <i class="bi bi-calendar-heart"></i>
+                <p>✨ Nenhum evento programado no momento</p>
+                <small>Volte em breve para conferir as novidades!</small>
               </div>
-            </div>
+            }
           </div>
-        </div>
-        
-        <div *ngIf="proximosEventos.length === 0" class="empty-state">
-          <i class="bi bi-calendar-heart"></i>
-          <p>✨ Nenhum evento programado no momento</p>
-          <small>Volte em breve para conferir as novidades!</small>
-        </div>
-      </div>
-
-      <!-- Aba Eventos Realizados -->
-      <div *ngIf="activeTab === 'realizados'" class="tab-pane">
-        <div class="events-grid" *ngIf="eventosConcluidos.length > 0">
-          <div class="event-card past-event" *ngFor="let evento of eventosConcluidos; let i = index" 
-               [routerLink]="['/eventos', evento.id]"
-               [style.animation-delay]="(i * 0.05) + 's'">
-            <div class="event-image">
-              <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
-              <span class="event-badge past">
-                <i class="bi bi-check-circle-fill"></i> Realizado
-              </span>
-            </div>
-            <div class="event-content">
-              <div class="event-date">
-                <span class="date-day">{{ formatarData(evento.dataHora).dia }}</span>
-                <span class="date-month">{{ formatarData(evento.dataHora).mes }}</span>
+        }
+        <!-- Aba Eventos Realizados -->
+        @if (activeTab === 'realizados') {
+          <div class="tab-pane">
+            @if (eventosConcluidos.length > 0) {
+              <div class="events-grid">
+                @for (evento of eventosConcluidos; track evento; let i = $index) {
+                  <div class="event-card past-event"
+                    [routerLink]="['/eventos', evento.id]"
+                    [style.animation-delay]="(i * 0.05) + 's'">
+                    <div class="event-image">
+                      <img [src]="getImagemUrl(evento.imagemPrincipal)" [alt]="evento.nome">
+                      <span class="event-badge past">
+                        <i class="bi bi-check-circle-fill"></i> Realizado
+                      </span>
+                    </div>
+                    <div class="event-content">
+                      <div class="event-date">
+                        <span class="date-day">{{ formatarData(evento.dataHora).dia }}</span>
+                        <span class="date-month">{{ formatarData(evento.dataHora).mes }}</span>
+                      </div>
+                      <h3 class="event-title">{{ evento.nome }}</h3>
+                      <p class="event-location">
+                        <i class="bi bi-geo-alt-fill"></i> {{ evento.local }}
+                      </p>
+                      @if (evento.descricao) {
+                        <p class="event-description">
+                          {{ evento.descricao | slice:0:80 }}...
+                        </p>
+                      }
+                      @if (!evento.descricao) {
+                        <p class="event-description">
+                          Evento realizado com sucesso! Confira os detalhes.
+                        </p>
+                      }
+                      <div class="event-footer">
+                        <span class="event-category">
+                          <i class="bi bi-tag-fill"></i> {{ evento.categoria || 'Ambiental' }}
+                        </span>
+                        <span class="event-participants">
+                          <i class="bi bi-people-fill"></i> {{ evento.participantes || 0 }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                }
               </div>
-              <h3 class="event-title">{{ evento.nome }}</h3>
-              <p class="event-location">
-                <i class="bi bi-geo-alt-fill"></i> {{ evento.local }}
-              </p>
-              <p class="event-description" *ngIf="evento.descricao">
-                {{ evento.descricao | slice:0:80 }}...
-              </p>
-              <p class="event-description" *ngIf="!evento.descricao">
-                Evento realizado com sucesso! Confira os detalhes.
-              </p>
-              <div class="event-footer">
-                <span class="event-category">
-                  <i class="bi bi-tag-fill"></i> {{ evento.categoria || 'Ambiental' }}
-                </span>
-                <span class="event-participants">
-                  <i class="bi bi-people-fill"></i> {{ evento.participantes || 0 }}
-                </span>
+            }
+            @if (eventosConcluidos.length === 0) {
+              <div class="empty-state">
+                <i class="bi bi-emoji-smile"></i>
+                <p>🎉 Nenhum evento realizado ainda</p>
+                <small>Seja o primeiro a participar dos nossos eventos!</small>
               </div>
-            </div>
+            }
           </div>
-        </div>
-        
-        <div *ngIf="eventosConcluidos.length === 0" class="empty-state">
-          <i class="bi bi-emoji-smile"></i>
-          <p>🎉 Nenhum evento realizado ainda</p>
-          <small>Seja o primeiro a participar dos nossos eventos!</small>
-        </div>
+        }
       </div>
-    </div>
+    }
   </div>
 </section>
+<mat-paginator class="estilo_paginacao" 
+              class="estilo_paginacao"
+              [length]="totalElements"
+              [pageSize]="pageSize"
+              [pageSizeOptions]="[6, 12, 24]"
+              [pageIndex]="currentPage"
+              (page)="onPageChange($event)"
+              aria-label="Select page">
+</mat-paginator>
 
 <footer class="footer">
   <div class="container-lg">

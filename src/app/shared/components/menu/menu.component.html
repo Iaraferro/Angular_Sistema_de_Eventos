@@ -19,21 +19,27 @@
             Eventos
           </a>
         </li>
-        <li class="nav-item" *ngIf="authService.isAdmin()">
-          <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
-            <i class="bi bi-shield-lock me-1"></i>Admin
-          </a>
-        </li>
-        <li class="nav-item" *ngIf="!authService.isLoggedIn()">
-          <a class="nav-link" routerLink="/login" routerLinkActive="active">
-            <i class="bi bi-box-arrow-in-right me-1"></i>Login
-          </a>
-        </li>
-        <li class="nav-item" *ngIf="authService.isLoggedIn()">
-          <a class="nav-link" href="#" (click)="$event.preventDefault(); logout()">
-            <i class="bi bi-box-arrow-right me-1"></i>Sair
-          </a>
-        </li>
+        @if (authService.isAdmin()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
+              <i class="bi bi-shield-lock me-1"></i>Admin
+            </a>
+          </li>
+        }
+        @if (!authService.isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/login" routerLinkActive="active">
+              <i class="bi bi-box-arrow-in-right me-1"></i>Login
+            </a>
+          </li>
+        }
+        @if (authService.isLoggedIn()) {
+          <li class="nav-item">
+            <a class="nav-link" href="#" (click)="$event.preventDefault(); logout()">
+              <i class="bi bi-box-arrow-right me-1"></i>Sair
+            </a>
+          </li>
+        }
       </ul>
     </div>
   </div>

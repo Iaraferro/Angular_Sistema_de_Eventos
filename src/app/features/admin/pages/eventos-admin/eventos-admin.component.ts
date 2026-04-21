@@ -8,10 +8,11 @@ import { Evento } from '../../../../shared/models/evento.model';
 import { EventoService } from '../../../../core/service/evento.service';
 import { AuthService } from '../../../../core/service/auth.service';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
+import {MatPaginatorModule} from '@angular/material/paginator';
 
 @Component({
   selector: 'app-eventos-admin',
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatPaginatorModule],
   templateUrl: './eventos-admin.component.html',
   styleUrl: './eventos-admin.component.css',
 })
@@ -19,6 +20,11 @@ export class EventosAdmin implements OnInit, OnDestroy {
   eventos: any[] = [];
   loading = true;
   excluindo = false;
+
+  totalElements = 0;
+  pageSize = 10;
+  currentPage = 0;
+
   private subscriptions = new Subscription();
 
   constructor(
@@ -36,13 +42,14 @@ export class EventosAdmin implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  carregarEventos(): void {
+   carregarEventos(): void {
     this.loading = true;
 
+    // ✅ Usando paginação em vez de listarEventos()
     this.subscriptions.add(
-      this.eventoService.listarEventos().subscribe({
-        next: (eventos: Evento[]) => {
-          this.eventos = eventos
+      this.eventoService.listarPaginado(this.currentPage, this.pageSize).subscribe({
+        next: (response) => {
+          this.eventos = response.content
             .sort((a, b) => new Date(b.dataHora).getTime() - new Date(a.dataHora).getTime())
             .map((evento) => ({
               ...evento,
@@ -52,8 +59,10 @@ export class EventosAdmin implements OnInit, OnDestroy {
               concluido: new Date(evento.dataHora) < new Date(),
             }));
 
+          this.totalElements = response.totalElements;
           this.loading = false;
 
+          // Carrega as imagens
           this.eventos.forEach((evento) => {
             if (evento.imagemPrincipalReal) {
               const img = new Image();
@@ -70,12 +79,18 @@ export class EventosAdmin implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Erro ao carregar eventos:', error);
           this.loading = false;
-          alert('Erro ao carregar eventos.');
+          this.toast.erro('Erro ao carregar eventos.');
         },
-      }),
+      })
     );
   }
 
+  // ✅ Método para mudar de página
+  onPageChange(event: any): void {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.carregarEventos();
+  }
   trackByEventoId(index: number, evento: any): number {
     return evento.id;
   }

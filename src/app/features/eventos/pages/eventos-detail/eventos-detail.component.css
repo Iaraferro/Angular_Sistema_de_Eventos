@@ -599,7 +599,7 @@ body {
   font-size: 1.4rem;
   font-weight: 700;
   margin-bottom: 12px;
-  color: white;
+  color: #1d6e44;;
 }
 
 .footer-brand i {
@@ -611,7 +611,7 @@ body {
   font-size: 0.8rem;
   opacity: 0.6;
   letter-spacing: 0.3px;
-  color: white;
+  color: rgb(29, 78, 24);
 }
 
 /* ============================================

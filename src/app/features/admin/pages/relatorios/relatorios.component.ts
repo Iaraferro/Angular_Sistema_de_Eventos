@@ -6,9 +6,8 @@ import { Subscription } from 'rxjs';
 import { Evento } from '../../../../shared/models/evento.model';
 import { EventoService } from '../../../../core/service/evento.service';
 
-
-declare const html2canvas: any;
-declare const jspdf: any;
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 
 interface RelatorioData {
   titulo: string;
@@ -25,6 +24,11 @@ interface RelatorioData {
   taxaSucesso: number;
 }
 
+interface ImagemRelatorio {
+  url: string;
+  file: File;
+  nome: string;
+}
 @Component({
   selector: 'app-relatorios',
   imports: [CommonModule, FormsModule],
@@ -36,6 +40,7 @@ export class Relatorios implements OnInit, OnDestroy{
   
   eventos: Evento[] = [];
   loading = true;
+  imagensRelatorio: ImagemRelatorio[] = [];
   
   // Dados do relatório
   relatorioData: RelatorioData = {
@@ -145,7 +150,7 @@ async gerarRelatorioPersonalizado(): Promise<void> {
     });
 
     const imgData = canvas.toDataURL('image/png');
-    const pdf = new jspdf.jsPDF({
+    const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
       format: 'a4'
@@ -187,19 +192,37 @@ private gerarRelatorioSimples(): void {
     setTimeout(() => win.print(), 500);
   }
 }
-
 private async montarRelatorioHTMLComImagens(): Promise<string> {
-  // Busca imagens dos eventos
-  const imagensPromises = this.eventos.slice(0, 5).map(async evento => {
-    let imgUrl = '';
-    if (evento.imagemPrincipal) {
-      imgUrl = this.eventoService.getImagemUrl(evento.imagemPrincipal);
-    }
-    return { id: evento.id, nome: evento.nome, imgUrl };
-  });
+  // Busca imagens dos eventos (máximo 5)
+  const imagensEventos = this.eventos
+    .filter(e => e.imagemPrincipal)
+    .slice(0, 5)
+    .map(evento => ({
+      nome: evento.nome,
+      imgUrl: this.eventoService.getImagemUrl(evento.imagemPrincipal),
+      tipo: 'evento'
+    }));
   
-  const imagens = await Promise.all(imagensPromises);
+  // Pega imagens adicionadas no relatório
+  const imagensUpload = this.imagensRelatorio.map(img => ({
+    nome: img.nome,
+    imgUrl: img.url,
+    tipo: 'relatorio'
+  }));
   
+  // Junta tudo (máximo 5 no total)
+  const todasImagens = [...imagensUpload, ...imagensEventos].slice(0, 5);
+  
+  // Gera HTML das imagens
+  const imagensHTML = todasImagens.map(img => `
+    <div class="image-card">
+      <img src="${img.imgUrl}" alt="${img.nome}" crossorigin="anonymous">
+      <p><strong>${img.nome}</strong></p>
+      <small>${img.tipo === 'evento' ? '📅 Evento' : '📎 Anexada'}</small>
+    </div>
+  `).join('');
+  
+  // Retorna o HTML completo
   return `
     <!DOCTYPE html>
     <html>
@@ -257,16 +280,22 @@ private async montarRelatorioHTMLComImagens(): Promise<string> {
           border-radius: 10px;
           overflow: hidden;
           text-align: center;
+          padding: 10px;
         }
         .image-card img {
           width: 100%;
           height: 150px;
           object-fit: cover;
+          border-radius: 8px;
         }
         .image-card p {
-          padding: 10px;
+          margin-top: 10px;
           font-size: 12px;
           font-weight: bold;
+        }
+        .image-card small {
+          font-size: 10px;
+          color: #666;
         }
         .footer {
           text-align: center;
@@ -282,6 +311,7 @@ private async montarRelatorioHTMLComImagens(): Promise<string> {
       <div class="header">
         <h1>🌿 ${this.relatorioData.titulo}</h1>
         <p>Data: ${new Date(this.relatorioData.dataRelatorio).toLocaleDateString('pt-BR')}</p>
+        ${this.relatorioData.periodo ? `<p>Período: ${this.relatorioData.periodo}</p>` : ''}
       </div>
 
       <div class="section">
@@ -294,16 +324,12 @@ private async montarRelatorioHTMLComImagens(): Promise<string> {
         </div>
       </div>
 
-      ${imagens.length > 0 ? `
+      <!-- SEÇÃO DE IMAGENS - SÓ APARECE SE TIVER IMAGENS -->
+      ${todasImagens.length > 0 ? `
       <div class="section">
-        <h2 class="section-title">📸 Imagens dos Eventos</h2>
+        <h2 class="section-title">📸 Imagens do Relatório</h2>
         <div class="images-grid">
-          ${imagens.map(img => `
-            <div class="image-card">
-              <img src="${img.imgUrl}" alt="${img.nome}" crossorigin="anonymous">
-              <p>${img.nome}</p>
-            </div>
-          `).join('')}
+          ${imagensHTML}
         </div>
       </div>
       ` : ''}
@@ -311,9 +337,12 @@ private async montarRelatorioHTMLComImagens(): Promise<string> {
       ${this.relatorioData.objetivo ? `<div class="section"><h2 class="section-title">🎯 Objetivo</h2><p>${this.relatorioData.objetivo}</p></div>` : ''}
       ${this.relatorioData.atividadesRealizadas ? `<div class="section"><h2 class="section-title">📋 Atividades</h2><p>${this.relatorioData.atividadesRealizadas}</p></div>` : ''}
       ${this.relatorioData.resultadosAlcancados ? `<div class="section"><h2 class="section-title">🏆 Resultados</h2><p>${this.relatorioData.resultadosAlcancados}</p></div>` : ''}
+      ${this.relatorioData.dificuldadesEncontradas ? `<div class="section"><h2 class="section-title">⚠️ Dificuldades</h2><p>${this.relatorioData.dificuldadesEncontradas}</p></div>` : ''}
+      ${this.relatorioData.proximasAcoes ? `<div class="section"><h2 class="section-title">🚀 Próximas Ações</h2><p>${this.relatorioData.proximasAcoes}</p></div>` : ''}
 
       <div class="footer">
         <p>Relatório gerado por EcoEventos Palmas</p>
+        <p>Gerado em: ${new Date().toLocaleString('pt-BR')}</p>
       </div>
     </body>
     </html>
@@ -556,5 +585,38 @@ private async montarRelatorioHTMLComImagens(): Promise<string> {
       totalParticipantes: this.totalParticipantes,
       taxaSucesso: 85
     };
+  }
+
+   adicionarImagens(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files) {
+      const files = Array.from(input.files);
+      const vagasRestantes = 5 - this.imagensRelatorio.length;
+      const filesToAdd = files.slice(0, vagasRestantes);
+      
+      filesToAdd.forEach(file => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            this.imagensRelatorio.push({
+              url: e.target?.result as string,
+              file: file,
+              nome: file.name
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      
+      if (files.length > vagasRestantes) {
+        alert(`Apenas ${vagasRestantes} imagem(ns) foram adicionadas. Máximo 5 imagens.`);
+      }
+      
+      input.value = '';
+    }
+  }
+
+  removerImagem(index: number): void {
+    this.imagensRelatorio.splice(index, 1);
   }
 }
