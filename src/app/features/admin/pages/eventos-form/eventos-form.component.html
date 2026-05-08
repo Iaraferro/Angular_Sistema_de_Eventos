@@ -21,15 +21,22 @@
           <i class="bi bi-arrow-left me-2"></i>Voltar
         </button>
       </div>
+
       <div class="card-dashboard">
         <div class="card-header bg-success text-white">
           <h5 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Informações do Evento</h5>
         </div>
+        
         <div class="card-body">
           <form (ngSubmit)="salvarEvento()" #eventoForm="ngForm">
             <div class="row">
-              <!-- COLUNA ESQUERDA -->
+              
+              <!-- ============================================ -->
+              <!-- COLUNA ESQUERDA (7/12)                       -->
+              <!-- ============================================ -->
               <div class="col-md-7">
+                
+                <!-- Título -->
                 <div class="mb-3">
                   <label for="titulo" class="form-label">
                     Título do Evento <span class="text-danger">*</span>
@@ -41,6 +48,7 @@
                   }
                 </div>
                 
+                <!-- Descrição -->
                 <div class="mb-3">
                   <label for="descricao" class="form-label">
                     Descrição <span class="text-danger">*</span>
@@ -52,17 +60,22 @@
                   }
                 </div>
                 
+                <!-- Data/Hora e Local (linha de 2 colunas) -->
                 <div class="row">
+                  <!-- Data e Horário (CORRIGIDO: datetime-local) -->
                   <div class="col-md-6 mb-3">
                     <label for="dataHora" class="form-label">
-                      Data do Evento <span class="text-danger">*</span>
+                      Data e Horário <span class="text-danger">*</span>
                     </label>
-                    <input type="date" class="form-control" id="dataHora"
+                    <input type="datetime-local" class="form-control" id="dataHora"
                       [(ngModel)]="evento.dataHora" name="dataHora" #dataHora="ngModel" required>
+                    <div class="form-text">Ex: 15/05/2025 14:30</div>
                     @if (dataHora.invalid && dataHora.touched) {
-                      <div class="text-danger small">Data é obrigatória</div>
+                      <div class="text-danger small">Data e horário são obrigatórios</div>
                     }
                   </div>
+                  
+                  <!-- Local -->
                   <div class="col-md-6 mb-3">
                     <label for="local" class="form-label">
                       Local <span class="text-danger">*</span>
@@ -75,7 +88,9 @@
                   </div>
                 </div>
                 
+                <!-- Categoria e E-mail (linha de 2 colunas) -->
                 <div class="row">
+                  <!-- Categoria -->
                   <div class="col-md-6 mb-3">
                     <label for="categoria" class="form-label">Categoria</label>
                     <select class="form-select" id="categoria" [(ngModel)]="evento.categoria" name="categoria">
@@ -105,6 +120,8 @@
                       <option value="UVCZ">🏥 UVCZ</option>
                     </select>
                   </div>
+                  
+                  <!-- E-mail de Contato -->
                   <div class="col-md-6 mb-3">
                     <label for="contato" class="form-label">
                       E-mail de Contato <span class="text-danger">*</span>
@@ -118,8 +135,23 @@
                 </div>
               </div>
               
-              <!-- COLUNA DIREITA -->
+              <!-- ============================================ -->
+              <!-- COLUNA DIREITA (5/12)                       -->
+              <!-- ============================================ -->
               <div class="col-md-5">
+                
+                <!-- ✅ ORGANIZADOR (NOVO CAMPO - CORRIGIDO) -->
+                <div class="mb-3">
+                  <label for="organizador" class="form-label">
+                    <i class="bi bi-building me-1"></i>Organizador/Realizador
+                  </label>
+                  <input type="text" class="form-control" id="organizador"
+                    [(ngModel)]="evento.organizador" name="organizador"
+                    placeholder="Ex: Secretaria de Meio Ambiente, ONG Verde, etc.">
+                  <div class="form-text">Nome da entidade ou pessoa responsável pelo evento</div>
+                </div>
+
+                <!-- Imagem do Evento -->
                 <div class="mb-3">
                   <label for="imagem" class="form-label">Imagem do Evento</label>
                   <input type="file" class="form-control" id="imagem"
@@ -138,22 +170,26 @@
                   </div>
                 </div>
                 
+                <!-- Requisitos -->
                 <div class="mb-3">
                   <label for="requisitos" class="form-label">Requisitos</label>
                   <textarea class="form-control" id="requisitos" rows="3"
                     [(ngModel)]="evento.requisitos" name="requisitos"
                     placeholder="Ex: Levar água, roupas confortáveis..."></textarea>
+                  <div class="form-text">O que os participantes precisam levar/saber</div>
                 </div>
                 
-                <div class="row" class="vagas">
-                  <div class="col-6 mb-3" >
-                    <label for="participantes" class="form-label">Vagas</label>
-                    <input type="number" class="form-control" id="participantes"
-                      [(ngModel)]="evento.participantes" name="participantes" min="0">
-                  </div>
+                <!-- Vagas (Número de Participantes) -->
+                <div class="mb-3">
+                  <label for="participantes" class="form-label">Vagas Disponíveis</label>
+                  <input type="number" class="form-control" id="participantes"
+                    [(ngModel)]="evento.participantes" name="participantes" min="0">
+                  <div class="form-text">Número máximo de participantes (0 = ilimitado)</div>
                 </div>
-              </div>
-            </div>
+                
+              </div> <!-- Fim coluna direita -->
+              
+            </div> <!-- Fim row -->
             
             <hr class="my-4">
             
@@ -176,9 +212,10 @@
                 }
               </button>
             </div>
+            
           </form>
-        </div>
-      </div>
+        </div> <!-- Fim card-body -->
+      </div> <!-- Fim card-dashboard -->
     </div>
   }
 </div>

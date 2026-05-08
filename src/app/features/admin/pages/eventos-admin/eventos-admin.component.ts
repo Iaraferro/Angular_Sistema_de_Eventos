@@ -45,7 +45,7 @@ export class EventosAdmin implements OnInit, OnDestroy {
    carregarEventos(): void {
     this.loading = true;
 
-    // ✅ Usando paginação em vez de listarEventos()
+    // Usando paginação em vez de listarEventos()
     this.subscriptions.add(
       this.eventoService.listarPaginado(this.currentPage, this.pageSize).subscribe({
         next: (response) => {
@@ -85,7 +85,7 @@ export class EventosAdmin implements OnInit, OnDestroy {
     );
   }
 
-  // ✅ Método para mudar de página
+  //  Método para mudar de página
   onPageChange(event: any): void {
     this.currentPage = event.pageIndex;
     this.pageSize = event.pageSize;

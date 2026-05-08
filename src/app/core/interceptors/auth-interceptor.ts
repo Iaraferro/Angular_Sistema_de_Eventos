@@ -10,13 +10,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   
   // Ignora requests específicos
-  const skipUrls = ['cloudinary.com', '/auth/login', '/auth/refresh', '/auth/verify'];
-  if (skipUrls.some(url => req.url.includes(url))) {
+  const publicUrls = ['/auth', 'cloudinary.com'];
+  if (publicUrls.some(url => req.url.includes(url))) {
     return next(req);
   }
   
   const token = authService.getToken();
-  
   let authReq = req;
   if (token) {
     authReq = req.clone({

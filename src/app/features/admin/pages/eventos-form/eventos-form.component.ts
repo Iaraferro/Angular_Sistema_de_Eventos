@@ -29,6 +29,7 @@ export class EventoForm implements OnInit, OnDestroy {
     contato: '',
     requisitos: '',
     participantes: 0,
+    organizador:''
   };
 
   isEditMode = false;
@@ -70,7 +71,7 @@ export class EventoForm implements OnInit, OnDestroy {
           let dataFormatada = '';
           if (evento.dataHora) {
             const data = new Date(evento.dataHora);
-            dataFormatada = data.toISOString().split('T')[0];
+            dataFormatada = data.toISOString().slice(0, 16);
           }
           this.evento = {
             id: evento.id,
@@ -82,6 +83,7 @@ export class EventoForm implements OnInit, OnDestroy {
             contato: evento.contato,
             requisitos: evento.requisitos,
             participantes: evento.participantes,
+            organizador: evento.organizador,
             imagemPrincipal: evento.imagemPrincipal,
           };
 
@@ -121,11 +123,16 @@ export class EventoForm implements OnInit, OnDestroy {
 
     let dataHoraFormatada = this.evento.dataHora;
 
-    if (dataHoraFormatada) {
-      if (!dataHoraFormatada.includes('T') && !dataHoraFormatada.includes(':')) {
-        dataHoraFormatada = `${dataHoraFormatada}T12:00:00`;
-      }
-    }
+     if (!dataHoraFormatada) {
+    this.toast.erro('Data e horário são obrigatórios');
+    this.loading = false;
+    return;
+  }
+
+  // Adiciona segundos se não tiver (datetime-local envia YYYY-MM-DDThh:mm)
+  if (dataHoraFormatada && !dataHoraFormatada.includes(':')) {
+    dataHoraFormatada = `${dataHoraFormatada}:00`;
+  }
 
     const eventoParaEnviar: Partial<Evento> = {
       nome: this.evento.nome,
@@ -137,6 +144,7 @@ export class EventoForm implements OnInit, OnDestroy {
       requisitos: this.evento.requisitos,
       participantes: this.evento.participantes || 0,
       imagemPrincipal: this.evento.imagemPrincipal,
+      organizador: this.evento.organizador
     };
 
     if (this.isEditMode && this.eventoId) {
@@ -192,6 +200,7 @@ export class EventoForm implements OnInit, OnDestroy {
             contato: this.evento.contato,
             requisitos: this.evento.requisitos,
             participantes: this.evento.participantes || 0,
+            organizador: this.evento.organizador,
             linkInscricao: this.evento.linkInscricao,
             imagemPrincipal: publicId,
           };

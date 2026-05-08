@@ -101,18 +101,14 @@ export class AuthService {
 
   // Adicione este método - verifica se o token é válido
 verifyToken(): Observable<boolean> {
-    const token = this.getToken();
-    if (!token) return of(false);
+
     return of(true);
   }
 
   
   refreshToken(): Observable<string> {
     // Se não tem endpoint de refresh, só retorna o token atual
-    const token = this.getToken();
-    if (token) {
-      return of(token);
-    }
+    
     this.logout();
     return throwError(() => new Error('No token to refresh'));
   }
